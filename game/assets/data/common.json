@@ -1,0 +1,190 @@
+{
+  "_aide": [
+    "Ce fichier contient les dialogues communs à tous les chapitres. Les répliques propres à un client sont dans clients/<nom>.json. Tu peux les modifier librement.",
+    "Une réplique = { \"who\": \"minuit\" | \"midi\" | \"client\", \"text\": \"...\" }.",
+    "Une liste de répliques = elles s'affichent l'une après l'autre (on touche « Suite »).",
+    "Une liste de phrases simples (sans who) = le jeu en tire une au hasard. \"who\": \"both\" = Minuit et Midi parlent ensemble.",
+    "Mots spéciaux remplacés par le jeu : {client}, {potion}, {calc}, {answer}, {ingredient}, {n}, {snack}, {chapter}, {good}, {total}, {lives}, {max}.",
+    "Attention : garde les guillemets droits \" et les virgules entre les éléments, sinon le fichier ne se charge plus. Tu peux vérifier sur https://jsonlint.com"
+  ],
+  "characters": { "minuit": {"name": "Minuit"}, "midi": {"name": "Midi"}, "both": {"name": "Minuit et Midi"} },
+  "titleIntro": [
+    { "who": "both", "text": "Nous sommes Minuit et Midi, les chats qui multiplient la magie !" },
+    { "who": "minuit", "text": "Je suis Minuit." },
+    { "who": "midi", "text": "Et moi, c'est Midi." },
+    { "who": "minuit", "text": "Lui, c'est le jour." },
+    { "who": "midi", "text": "Et elle, c'est du pain frit !" },
+    { "who": "minuit", "text": "Midi ! On avait dit que tu devais dire : et elle, c'est la nuit !" },
+    { "who": "midi", "text": "À midi, j'ai toujours faim." },
+    { "who": "minuit", "text": "Ah, un client arrive !" }
+  ],
+  "steps": {
+    "intro": {
+      "start": [
+        { "who": "minuit", "text": "Avant de soigner {client}, regarde : tu connais déjà une partie des calculs !" }
+      ],
+      "known": "Tu les connais déjà ! Ce sont des calculs que tu as vus dans l'autre sens.",
+      "knownTitle": "Tu les connais déjà !",
+      "end": [
+        { "who": "minuit", "text": "Parfait, on peut commencer !" }
+      ]
+    },
+    "recette": {
+      "intro": [
+        { "who": "minuit", "text": "Voici l'ordonnance. Midi, tu vas chercher les ingrédients. Mais d'abord, on calcule les quantités !" },
+        { "who": "midi", "text": "Calculer ? C'est mon point fort. Enfin… presque." }
+      ],
+      "line": "Combien de {ingredient} ? {calc}",
+      "outro": [
+        { "who": "minuit", "text": "La liste est prête. Midi, file au marché ! Et pas de bêtises !" },
+        { "who": "midi", "text": "Moi ? Des bêtises ? Jamais !" },
+        { "who": "minuit", "text": "Pendant ce temps, je prépare le bouillon de la potion." }
+      ],
+      "again": [
+        { "who": "minuit", "text": "Suite de l'ordonnance !" }
+      ],
+      "missing": [
+        { "who": "minuit", "text": "Oh non ! Il ne reste presque plus d'ingrédients dans la boutique !" }
+      ]
+    },
+    "bouillon": {
+      "intro": [
+        { "who": "minuit", "text": "Le bouillon doit faire exactement {n} ml. Tu as des fioles de {a}, {b} et {c} ml : verse-les dans le chaudron !" }
+      ],
+      "twist": [
+        { "who": "client", "text": "Ça sent… le chou-fleur ?" },
+        { "who": "minuit", "text": "C'est NORMAL. Continue !" }
+      ],
+      "outro": [
+        { "who": "minuit", "text": "Parfait. Le bouillon frémit… Ah ! Voilà Midi qui revient." },
+        { "who": "midi", "text": "Livraison ! J'ai tout rapporté. Et peut-être un petit truc en plus…" }
+      ],
+      "again": [
+        { "who": "minuit", "text": "Encore un bouillon : il faut {n} ml cette fois." }
+      ],
+      "series": [
+        { "who": "minuit", "text": "Nouvelles fioles : {a}, {b} et {c} ml ! Le bouillon doit faire {n} ml." }
+      ]
+    },
+    "review": {
+      "start": [
+        { "who": "minuit", "text": "Avant de continuer, regarde bien les calculs à retenir." }
+      ],
+      "title": "À retenir"
+    },
+    "sacs": {
+      "intro": [
+        { "who": "minuit", "text": "Range les {ingredient} sur l'étagère, en rangées toutes pareilles. Il y en a {n}." }
+      ],
+      "midiEats": "Mon goûter ! Je le garde pour plus tard.",
+      "midiEatsMinuit": "Midi ! Tu as caché ton goûter dans mes sacs ?!",
+      "outro": [
+        { "who": "midi", "text": "Il fallait bien que je mange quelque chose pendant les courses…" },
+        { "who": "minuit", "text": "Grrr. On passe au mélange. Attention, il en a caché d'autres !" }
+      ]
+    },
+    "melange": {
+      "intro": [
+        { "who": "minuit", "text": "Les ingrédients remontent dans les bulles. Touche la bulle avec le bon nombre !" },
+        { "who": "minuit", "text": "Et ne t'occupe pas des goûters de Midi : ce ne sont pas des ingrédients !" }
+      ],
+      "midiChase": "Mon goûter !",
+      "midiBubble": "Hé ! Sortez-moi de là !",
+      "clientBubble": "Hé ! Qu'est-ce que je fais dans une bulle ?",
+      "clientTouched": "Ce n'est que {client} ! Cherche le bon nombre.",
+      "bombTouched": "Ce n'est qu'un goûter de Midi ! Cherche le bon nombre.",
+      "midiTouched": "Hé ! Arrête de me chatouiller, cherche le bon nombre !",
+      "outro": [
+        { "who": "minuit", "text": "Le mélange est fini ! La potion est presque prête." },
+        { "who": "midi", "text": "Je peux goûter ?" },
+        { "who": "minuit", "text": "NON." }
+      ],
+      "divide": "Ah, Midi, tu m'as déconcentrée ! La potion est trop forte, il faut tout diviser !"
+    },
+    "coffrets": {
+      "intro": [
+        { "who": "minuit", "text": "Range les {n} {ingredient} que Midi a rapportés dans des coffrets de {t}." }
+      ],
+      "twist": [
+        { "who": "midi", "text": "Je compte avec toi ! Un, deux, trois… euh, c'était quoi après ?" }
+      ],
+      "outro": [
+        { "who": "minuit", "text": "Tout est emballé. On passe au mélange !" }
+      ]
+    },
+    "potion": {
+      "intro": [
+        { "who": "minuit", "text": "{client}, bois ta {potion} !" },
+        { "who": "client", "text": "Glou… glou… glou…" }
+      ],
+      "explode": [
+        { "who": "minuit", "text": "Oh non… La potion a explosé !" },
+        { "who": "midi", "text": "On recommence ? Cette fois, je ne touche à rien !" }
+      ]
+    },
+    "boites": {
+      "intro": [
+        { "who": "minuit", "text": "Pour soigner {client}, il faut ranger les ingrédients dans des boîtes." },
+        { "who": "minuit", "text": "Il va falloir ranger tous ces ingrédients, aide-moi à trouver la bonne taille !" }
+      ],
+      "ask": "Range les {n} {ingredient} dans {k} boîtes : quelle taille de boîte ?",
+      "again": [
+        { "who": "midi", "text": "Encore des ingrédients ! J'ai rapporté tout le marché." }
+      ],
+      "outro": [
+        { "who": "minuit", "text": "Tout est bien rangé ! On passe au mélange." }
+      ]
+    }
+  },
+  "midi": {
+    "brag": [
+      "Bravo ! C'est moi qui t'ai appris ça.",
+      "Pas mal… pour une petite sœur !",
+      "Facile ! J'aurais fait pareil. En plus vite.",
+      "Ouais ! On forme une super équipe. Surtout moi."
+    ],
+    "mock": [
+      "Ha ha ! Même moi j'aurais trouvé !",
+      "Oups ! Tu as mangé mon goûter, ton cerveau ?",
+      "Raté ! Je le dirai à personne… sauf à tout le monde.",
+      "Hi hi ! Le chaudron rigole aussi !"
+    ]
+  },
+  "minuit": {
+    "celebrate": ["Parfait !", "Magique !", "Exactement ça !", "Bien joué !"],
+    "solution": [
+      "Ce n'est pas grave, regarde la bonne réponse. On continue !",
+      "Oups ! Voilà la bonne réponse. On continue !"
+    ]
+  },
+  "chapterEnd": {
+    "title": "Fin du chapitre {chapter}",
+    "success": "Potion réussie !",
+    "fail": "Potion ratée… mais quelle rigolade !",
+    "explode": "La potion a explosé ! On réessaiera.",
+    "score": "Bonnes réponses : {good} / {total}",
+    "lives": "Vies restantes : {lives} / {max}",
+    "remember": "À retenir :",
+    "perfect": "Sans faute ! Bravo !",
+    "sessionEnd": "Fin de la session ! Bravo !",
+    "next": "Suite"
+  },
+  "correction": { "title": "Retiens bien :", "next": "Suite" },
+  "quit": { "title": "Quitter le chapitre ?", "yes": "Quitter", "no": "Continuer" },
+  "ingredients": [
+    { "id": "oeil", "name": "œil de crapaud", "plural": "yeux de crapaud", "sprite": {"key": "hallow", "frame": 19} },
+    { "id": "aile", "name": "aile de chauve-souris", "plural": "ailes de chauve-souris", "sprite": {"key": "hallow", "frame": 20} },
+    { "id": "citrouille", "name": "citrouille-lanterne", "plural": "citrouilles-lanternes", "sprite": {"key": "hallow", "frame": 1} },
+    { "id": "perle", "name": "perle de nuit", "plural": "perles de nuit", "sprite": {"key": "hallow", "frame": 4} },
+    { "id": "bonbon", "name": "bonbon de lune", "plural": "bonbons de lune", "sprite": {"key": "hallow", "frame": 7} },
+    { "id": "doigt", "name": "doigt de troll", "plural": "doigts de troll", "sprite": {"key": "hallow", "frame": 23} }
+  ],
+  "snacks": [
+    { "id": "sandwich", "name": "sandwich", "plural": "sandwichs", "sprite": {"key": "sandwich"} },
+    { "id": "cookie", "name": "biscuit", "plural": "biscuits", "sprite": {"key": "cookies"} },
+    { "id": "crepe", "name": "crêpe", "plural": "crêpes", "sprite": {"key": "pancakes"} },
+    { "id": "banane", "name": "banane", "plural": "bananes", "sprite": {"key": "tiny", "frame": 1} },
+    { "id": "jambon", "name": "jambon", "plural": "tranches de jambon", "sprite": {"key": "tiny", "frame": 11} }
+  ],
+  "chapterClients": ["chatboite", "chatcacahuete", "chatboite"]
+}

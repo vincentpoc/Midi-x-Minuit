@@ -1,0 +1,14 @@
+# Packs d'assets d'origine, s'ils sont un jour copiés à la racine du dépôt (ils ont leurs propres licences).
+# Le « / » du début limite la règle à la racine : game/assets (les images du jeu) reste bien dans le dépôt.
+# /Assets/
+# Système
+Thumbs.db
+desktop.ini
+.DS_Store
+.vscode/
+# Captures des tests automatiques (tools/test.py)
+tests_out/
+# Scripts de commit locaux
+*.bat
+# Documents generes par Claude (peuvent contenir des infos personnelles)
+Claude outputs/

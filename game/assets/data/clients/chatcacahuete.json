@@ -1,0 +1,91 @@
+{
+  "name": "Chat-cacahuète",
+  "healedName": "Cookie",
+  "potion": "potion de décacahuétage",
+  "look": { "sprite": "chatcacahuete", "scale": 3, "footY": 1, "game": "chase", "healed": "cookie_cat", "sleeping": "cookie_sleep", "failed": "peanut_butter" },
+  "arrive": [
+    { "who": "client", "text": "Bonjour… Je crois que j'ai mangé trop de cacahuètes." },
+    { "who": "minuit", "text": "Trop de cacahuètes ? Tu ES une cacahuète !" },
+    { "who": "midi", "text": "Miam… Une cacahuète géante !" }
+  ],
+  "ausculte": {
+    "intro": [
+      { "who": "minuit", "text": "Ne bouge pas, je vais t'ausculter." },
+      { "who": "midi", "text": "Moi aussi, j'adore les cacahuètes…" }
+    ],
+    "start": { "who": "minuit", "text": "Midi, NON ! Vite, éloigne Chat-cacahuète de Midi !" },
+    "hint": "Glisse Chat-cacahuète loin de Midi !",
+    "tapHint": "Tape vite sur Midi !",
+    "caught": { "who": "minuit", "text": "Il l'a attrapé ! Tape sur Midi !" },
+    "released": { "who": "midi", "text": "Aïe ! Bon, d'accord…" },
+    "stop": [
+      { "who": "minuit", "text": "Bravo ! Il ne l'a jamais attrapé. Midi, va t'asseoir." }
+    ],
+    "done": [
+      { "who": "minuit", "text": "Hmm… C'est une cacahuétose aiguë. Il te faut une {potion} !" },
+      { "who": "client", "text": "Une potion ? Elle a un goût de cacahuète ?" },
+      { "who": "midi", "text": "J'espère !" }
+    ],
+    "lick": "Miam… Une cacahuète géante…",
+    "trial": "Essaie : glisse Chat-cacahuète avec ton doigt !",
+    "trialDone": "Bravo, comme ça !",
+    "go": { "who": "minuit", "text": "Attention, il accélère !" },
+    "stopCaught": [
+      { "who": "minuit", "text": "Ça suffit, Midi ! Va t'asseoir." },
+      { "who": "midi", "text": "Mais il sent tellement bon…" }
+    ]
+  },
+  "recette": {
+    "snacks": [
+      { "who": "midi", "text": "Et maintenant, mes ingrédients préférés !" },
+      { "who": "minuit", "text": "Midi ! Ce sont tes goûters, pas des ingrédients !" },
+      { "who": "midi", "text": "Juste pour vérifier… Ça ne compte pas !" }
+    ],
+    "snacksOk": [
+      { "who": "minuit", "text": "Parfait, même avec des goûters ! On garde les vrais ingrédients pour la potion." }
+    ],
+    "redo": [
+      { "who": "minuit", "text": "Hmm… Refaisons ces calculs avec les vrais ingrédients." },
+      { "who": "minuit", "text": "Cette fois, ça compte !" }
+    ]
+  },
+  "courses": [
+    { "who": "midi", "text": "Tous ces goûters m'ont donné faim… Je file au marché !" }
+  ],
+  "shelfCookie": { "found": "Mon cookie ! Je l'avais perdu dans le sac !", "minuit": "C'était donc ça, ton « petit quelque chose »…" },
+  "success": [
+    { "who": "minuit", "text": "Ça marche ! Regardez, c'est un petit chat roux !" },
+    { "who": "minuit", "text": "Comment tu t'appelles ?" },
+    { "who": "client", "text": "Je m'appelle Cookie." },
+    { "who": "minuit", "text": "Pourquoi Cookie ?" },
+    { "who": "client", "text": "Parce que je mange trop de cookies." }
+  ],
+  "finalGame": {
+    "intro": [
+      { "who": "midi", "text": "Hé ! Pas touche à mon cookie !" },
+      { "who": "minuit", "text": "Vite, éloigne le cookie de Midi loin de Cookie !" }
+    ],
+    "start": { "who": "client", "text": "Un cookie… Juste une petite bouchée…" },
+    "hint": "Glisse le cookie de Midi loin de Cookie !",
+    "protected": [
+      { "who": "client", "text": "Bon… Je vais faire une petite sieste." },
+      { "who": "midi", "text": "Ouf ! Mon cookie est sauvé." }
+    ],
+    "caught": [
+      { "who": "client", "text": "Miam ! … Oh oh." },
+      { "who": "minuit", "text": "Il a mangé le cookie… et il s'est transformé en cookie !" },
+      { "who": "midi", "text": "MON COOKIE ! … Euh, Cookie ?" }
+    ]
+  },
+  "fail": [
+    { "who": "client", "text": "Euh… Pourquoi je suis tout collant ?" },
+    { "who": "minuit", "text": "Oh non ! Il est devenu du beurre de cacahuète !" },
+    { "who": "midi", "text": "Moi aussi, moi aussi !" }
+  ],
+  "failDrink": [
+    { "who": "minuit", "text": "Midi, non !" }
+  ],
+  "failFly": [
+    { "who": "midi", "text": "Youpi !" }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "name": "Chat-boîte",
+  "sprite": "boxcat",
+  "potion": "potion de décollage",
+  "arrive": [
+    { "who": "client", "text": "Au secours ! Je suis coincé dans ma boîte depuis ce matin !" },
+    { "who": "midi", "text": "Ha ha ha ! On dirait un colis ! Je peux t'envoyer par la poste ?" },
+    { "who": "minuit", "text": "Midi ! … Ne bouge pas, {client}. Je vais t'ausculter." }
+  ],
+  "ausculte": {
+    "intro": [
+      { "who": "minuit", "text": "Il va falloir…" }
+    ],
+    "start": { "who": "midi", "text": "LE SECOUER PLEIN DE FOIS !" },
+    "tickle": { "who": "client", "text": "Ça chatouille !" },
+    "aaah": { "who": "client", "text": "Aaah, aaah, aaah !" },
+    "upDown": { "who": "midi", "text": "Peut-être de haut en bas ?" },
+    "tap": { "who": "midi", "text": "Peut-être qu'en tapant dessus, ça va marcher ?" },
+    "stop": [
+      { "who": "minuit", "text": "Arrête !" }
+    ],
+    "done": [
+      { "who": "minuit", "text": "Hmm… La boîte est collée avec de la bave de limace. Il te faut une {potion} !" },
+      { "who": "client", "text": "Une potion ? Elle a bon goût au moins ?" },
+      { "who": "midi", "text": "Non. Jamais. Aucune." }
+    ]
+  },
+  "success": [
+    { "who": "minuit", "text": "Bah, pourquoi tu ne sors pas de ta boîte ?" },
+    { "who": "client", "text": "Ah, je suis bien dans ma boîte. Finalement, je vais rester dedans." },
+    { "who": "midi", "text": "ON VA LE SECOUER !" }
+  ],
+  "fail": [
+    { "who": "client", "text": "Pourquoi je flotte ? C'est ça, ta potion de décollage ?!" },
+    { "who": "midi", "text": "Moi aussi, moi aussi !" }
+  ],
+  "failDrink": [
+    { "who": "minuit", "text": "Midi, non !" }
+  ],
+  "failFly": [
+    { "who": "midi", "text": "Youpi !" }
+  ],
+  "look": { "sprite": "boxcat", "scale": 5, "footY": 0.95, "game": "shake", "healed": "boxcat", "failed": "green" }
+}

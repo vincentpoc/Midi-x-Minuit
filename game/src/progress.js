@@ -9,7 +9,7 @@
 
 RM.Progress = {
   // v1.0 : nouvelle clé = la partie repart à zéro (nouveau découpage des chapitres)
-  KEY: 'minuit-midi-v1.0',
+  KEY: 'midi-x-minuit-v1.0',
 
   // Nombre de jours avant de revoir un fait, selon son niveau.
   INTERVALS: [0, 1, 2, 4, 7],

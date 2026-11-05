@@ -466,7 +466,7 @@ Object.assign(RM.StoryScene.prototype, {
   },
 
   // Mélanger : d'autres calculs du chapitre, en plein écran.
-  // 3 petits multiples (× 2 à × 5), 3 grands (× 6 à × 10), 3 divisions
+  // 3 petits multiples (× 2 à × 5), 3 grands (× 6 à × 10), et 3 divisions si RM.BUBBLE_DIVISIONS
   async stepBubbles()
   {
     if (!this.go('bulles'))
@@ -515,7 +515,12 @@ Object.assign(RM.StoryScene.prototype, {
     });
 
     want(RM.PER_SERIES - must.length, (k) => k > RM.SMALL_MAX_K, false);
-    want(RM.PER_SERIES, () => true, true);
+
+    if (RM.BUBBLE_DIVISIONS)
+    {
+      want(RM.PER_SERIES, () => true, true);
+    }
+
     await this.dialog(this.fill(St.melange.intro));
     await this.bubbles(qs, this.ings, this.snacks.slice(2)); // les bravos sont faits dans la scène des bulles
     await this.dialog(this.fill(St.melange.outro));
@@ -592,6 +597,12 @@ Object.assign(RM.StoryScene.prototype, {
 
       seen.add(`${t}x${k}`);
       bags.push({ ing: RM.pick(flat).ing, t, k, N: t * k });
+    }
+
+    // le 1er sac a ses colonnes imposées et démarre à 2 rangées : 2 rangées seraient déjà la bonne réponse
+    if (bags[0].k === 2)
+    {
+      bags.push(bags.shift());
     }
 
     return bags;

@@ -1,7 +1,7 @@
 // ============================================================
 //  BubblesAct — Mélanger : une scène en plein écran (décor du chaudron).
 //    Bulles d'ingrédients qui tournent, avec des nombres droits.
-//    3 petits multiples, 3 grands, puis 3 divisions (questions avec div: true).
+//    3 petits multiples, 3 grands, puis 3 divisions si RM.BUBBLE_DIVISIONS (questions avec div: true).
 //    Bulles-pièges = le goûter de Midi (pas de nombre, plus rapides).
 //    Les toucher ne compte PAS comme une erreur et n'arrête pas la question.
 //    Le tout dernier calcul a toujours une bulle-piège.
@@ -9,7 +9,7 @@
 //    Mauvaise réponse : la bonne s'affiche dans la question (pas de fenêtre de correction).
 //    Q1 : une bulle-goûter monte → Midi crie « Mon goûter ! » et part en courant après.
 //    Dernière multiplication : Midi est dans une bulle (à la place d'une bulle-piège).
-//    2e division : le client est dans une bulle.
+//    Avant-dernière multiplication (2e division s'il y en a) : le client est dans une bulle.
 //  Les hooks viennent de StoryScene (voir hooks() dans StoryScene.js).
 // ============================================================
 
@@ -60,7 +60,8 @@ RM.BubblesAct = class
     this.total = questions.length;
     this.n = 0;
     this.midiShown = false; // Midi dans une bulle : la dernière multiplication
-    this.divCount = 0; // le client dans une bulle : la 2e division
+    this.divCount = 0; // pour trouver la 2e division
+    this.clientShown = false; // le client dans une bulle : une seule fois
     this.midiGone = false;
     this.bubbles = [];
     this.requeued = new Set();
@@ -203,7 +204,12 @@ RM.BubblesAct = class
       this.divCount++;
     }
 
-    const clientNow = !inMul && this.divCount === 2;
+    // le client dans une bulle : à la 2e division, ou à l'avant-dernière multiplication s'il n'y a pas de divisions
+    const clientTurn = this.divAnnounced || this.divQ.length
+      ? !inMul && this.divCount === 2
+      : this.mulQ.length === 1;
+
+    const clientNow = clientTurn && !this.clientShown;
     const lastQ = !this.mulQ.length && !this.divQ.length; // le tout dernier calcul : toujours une bulle-piège
 
     this.n++;
@@ -231,6 +237,8 @@ RM.BubblesAct = class
     }
     else if (clientNow && this.client)
     {
+      this.clientShown = true;
+
       this.bubbles.push(
         this.makeBubble(lanes[3], y0, { bomb: true, client: this.client }, FAST, 500),
       );

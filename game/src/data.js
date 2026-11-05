@@ -41,8 +41,11 @@ RM.SHORT_SERIES = 2;
 // Le chaudron du bouillon : image de witch-cauldron.png (0 noir, 1 suspendu, 2 tête de mort, 3 cuivre)
 RM.CAULDRON_FRAME = 0;
 
-// Bulles du mélange : 3 petits multiples (jusqu'à × 5), 3 grands (à partir de × 6), 3 divisions
+// Bulles du mélange : 3 petits multiples (jusqu'à × 5), 3 grands (à partir de × 6)
 RM.SMALL_MAX_K = 5;
+
+// Les 3 divisions des bulles : trop dures pour l'instant, gardées pour le futur mode difficile
+RM.BUBBLE_DIVISIONS = false;
 
 // Chance qu'une bulle-piège accompagne une question
 RM.BOMB_CHANCE = 0.7;

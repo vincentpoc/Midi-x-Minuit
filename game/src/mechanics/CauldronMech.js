@@ -411,7 +411,9 @@ RM.CauldronMech = class
       g.lineStyle(3, this.potColor(t), 0.9).strokeRoundedRect(A.x + 150, y - 24, 380, 48, 12);
 
       const ic = RM.icon(s, A.x + 180, y, { key: `pot_${this.potKey(t)}`, frame: 0 }, 40);
-      const str = v === null ? `${n} × ${t} ml` : `${n} × ${t} ml = ${v}`;
+
+      // une seule fiole : pas de « 1 × », seulement ses ml
+      const str = n === 1 ? `${t} ml` : v === null ? `${n} × ${t} ml` : `${n} × ${t} ml = ${v}`;
       const txt = RM.text(s, A.x + 210, y, str, 32, this.verdict === 'bad' ? RM.BAD : RM.C.ink).setOrigin(0, 0.5);
 
       this.lineLayer.add([g, ic, txt]);
@@ -423,11 +425,11 @@ RM.CauldronMech = class
       }
     });
 
-    // badges « ×3 » sur les potions
+    // badges « ×3 » sur les potions (rien pour une seule fiole)
     this.stands.forEach((st) =>
       st.badge
         .setText(this.counts[st.t] ? `×${this.counts[st.t]}` : '')
-        .setVisible(this.counts[st.t] > 0),
+        .setVisible(this.counts[st.t] > 1),
     );
 
     // le chaudron affiche l'objectif (écrit une fois pour toutes dans build)
@@ -857,7 +859,9 @@ RM.CauldronMech = class
       repeat: 1,
     });
 
-    const parts = o.tables.filter((t) => this.counts[t] > 0).map((t) => `${this.counts[t]} × ${t}`);
+    const parts = o.tables
+      .filter((t) => this.counts[t] > 0)
+      .map((t) => (this.counts[t] === 1 ? String(t) : `${this.counts[t]} × ${t}`));
 
     this.addCaption(`${parts.join(' + ')} = ${o.N} ml`);
   }

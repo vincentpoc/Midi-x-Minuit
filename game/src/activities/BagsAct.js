@@ -17,8 +17,8 @@ RM.BagsAct = class
     this.snack = snack;
     this.hooks = hooks;
     this.root = scene.add.container(0, 0);
-    this.rows = 1;
-    this.cols = fixed ? bag.t : 1;
+    this.rows = 2;
+    this.cols = fixed ? bag.t : 2;
 
     // le goûter de Midi est caché dans certains sacs seulement (snack = null : pas de goûter)
     this.intrusAt = snack ? Phaser.Math.Between(1, bag.N - 1) : -1; // jamais le premier ni le dernier
@@ -99,7 +99,7 @@ RM.BagsAct = class
     this.draw();
   }
 
-  // − valeur + (de 1 à 10). Renvoie { setEnabled, animateTo } comme l'ancien slider.
+  // − valeur + (de 2 à 10 : jamais de calcul × 1). Renvoie { setEnabled, animateTo } comme l'ancien slider.
   stepper(x, y, get, set)
   {
     const s = this.scene,
@@ -109,7 +109,7 @@ RM.BagsAct = class
 
     const change = (d, fromUser = true) =>
     {
-      const v = Phaser.Math.Clamp(get() + d, 1, 10);
+      const v = Phaser.Math.Clamp(get() + d, 2, 10);
 
       if (v === get())
       {

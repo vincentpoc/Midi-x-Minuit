@@ -5,7 +5,7 @@
 #  (pas de « python -m http.server » à lancer à part, donc plus d'erreur
 #  « Exit code 7 / 000 » parce que le serveur n'est pas prêt ou a été arrêté).
 #
-#  Utilisation (depuis le dossier Minuit-X-Midi) :
+#  Utilisation (depuis le dossier Midi-x-Minuit) :
 #    python tools/test.py                       démarrage simple + capture
 #    python tools/test.py --query mode=3        ajoute des paramètres à l'adresse
 #    python tools/test.py --scenario s.py       exécute un scénario (voir plus bas)
@@ -74,7 +74,7 @@ def charger_scenario(chemin):
 
 def lire_arguments():
     """Lit les options de la ligne de commande."""
-    p = argparse.ArgumentParser(description='Teste le démarrage du jeu Minuit × Midi.')
+    p = argparse.ArgumentParser(description='Teste le démarrage du jeu Midi × Minuit.')
     p.add_argument('--query', default='', help='paramètres en plus de reset=1, ex. mode=3')
     p.add_argument('--garder', action='store_true', help='ne pas effacer la sauvegarde (pas de reset=1)')
     p.add_argument('--scenario', help='fichier Python qui définit run(page, capture)')

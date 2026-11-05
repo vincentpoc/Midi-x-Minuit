@@ -1,4 +1,4 @@
-# Minuit × Midi
+# Midi × Minuit
 
 Un petit jeu de potions pour réviser les tables de multiplication et de division (2 à 10), fait pour un enfant de moins de 10 ans.
 Minuit, la petite sœur sorcière, prépare les potions ; Midi, le grand frère gourmand, l'aide… et fait des bêtises.

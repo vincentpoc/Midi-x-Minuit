@@ -1,5 +1,5 @@
 // ============================================================
-//  TitleScene — menu principal « Minuit × Midi »
+//  TitleScene — menu principal « Midi × Minuit »
 //  - « Commencer » (chapitre 1) : le titre et les boutons
 //    disparaissent, Minuit et Midi se présentent en bulles,
 //    puis on entre dans la boutique.
@@ -29,10 +29,10 @@ RM.TitleScene = class extends Phaser.Scene
     this.add.image(W / 2, H / 2, 'bg_title').setScale(3);
     this.add.rectangle(W / 2, H / 2, W, H, 0x120a1c, 0.35);
 
-    // le titre, sur une seule ligne : « Minuit × Midi » (le × en doré)
-    const tA = RM.title(this, 0, 200, 'Minuit', 92);
+    // le titre, sur une seule ligne : « Midi × Minuit » (le × en doré)
+    const tA = RM.title(this, 0, 200, 'Midi', 92);
     const tX = RM.title(this, 0, 200, '×', 92).setColor(RM.C.goldText);
-    const tB = RM.title(this, 0, 200, 'Midi', 92);
+    const tB = RM.title(this, 0, 200, 'Minuit', 92);
     const gap = 22;
     let tw = tA.width + tX.width + tB.width + gap * 2;
     const k = Math.min(1, (W - 40) / tw);

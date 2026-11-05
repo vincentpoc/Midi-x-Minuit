@@ -1,4 +1,4 @@
-# Minuit × Midi — notes pour Claude Code
+# Midi × Minuit — notes pour Claude Code
 
 Jeu éducatif pour le joueur (un enfant de moins de 10 ans) : réviser les tables de × et ÷ (2 à 10).
 Mode histoire avec Minuit (la petite sœur sorcière) et Midi (le grand frère gourmand et vantard).
@@ -33,7 +33,7 @@ Sur le PC de l'auteur, `python` marche mais `pip` tout seul n'est pas reconnu : 
 `?reset=1` efface la sauvegarde.
 
 ## Tester (pour Claude)
-Toujours passer par `python tools/test.py` (depuis `Minuit-X-Midi`) : il lance lui-même le serveur sur un port libre, ouvre le jeu dans Chromium sans fenêtre, attend la fin du chargement, enregistre les captures dans `tests_out/` et liste les erreurs JS et fichiers manquants (code de sortie 1 s'il y en a).
+Toujours passer par `python tools/test.py` (depuis `Midi-x-Minuit`) : il lance lui-même le serveur sur un port libre, ouvre le jeu dans Chromium sans fenêtre, attend la fin du chargement, enregistre les captures dans `tests_out/` et liste les erreurs JS et fichiers manquants (code de sortie 1 s'il y en a).
 - Ne pas lancer `python -m http.server` en arrière-plan puis le sonder avec `curl` : le serveur n'est pas toujours prêt ou a été arrêté entre deux messages (« Exit code 7 », « 000 »).
 - `--query mode=3` ajoute des paramètres ; `--garder` garde la sauvegarde ; `--scenario fichier.py` exécute un `run(page, capture)` avec des clics en coordonnées du jeu (720 × 1280).
 

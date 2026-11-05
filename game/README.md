@@ -1,4 +1,4 @@
-# Minuit × Midi — mode histoire (v0.9 : chapitres 1 et 2)
+# Midi × Minuit — mode histoire (v0.9 : chapitres 1 et 2)
 
 Jeu Phaser 3 (HTML/JS, sans compilation), en portrait, pour réviser les tables de × et ÷.
 
@@ -32,7 +32,7 @@ Pour tester le chaudron sans résultats ni total (il faut calculer de tête), aj
 
 ## Tester automatiquement
 
-Depuis le dossier `Minuit-X-Midi` : `python tools/test.py` vérifie que le jeu démarre sans erreur et enregistre une capture dans `tests_out/`. Ajoute `--voir` pour regarder le navigateur. Il faut Playwright, à installer une seule fois (et à refaire après une mise à jour de Python) :
+Depuis le dossier `Midi-x-Minuit` : `python tools/test.py` vérifie que le jeu démarre sans erreur et enregistre une capture dans `tests_out/`. Ajoute `--voir` pour regarder le navigateur. Il faut Playwright, à installer une seule fois (et à refaire après une mise à jour de Python) :
 
 ```bash
 python -m pip install playwright

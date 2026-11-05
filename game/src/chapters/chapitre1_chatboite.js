@@ -3,6 +3,7 @@
 //
 //  Chat-boîte est coincé dans sa boîte. Midi le secoue pour « l'ausculter ».
 //  Potion réussie : il préfère rester dedans… et Midi le re-secoue !
+//    Secoué assez vite (RM.SHAKE_TIME_LIMIT), il sort de sa boîte : c'est Chracula.
 //  Potion ratée : le client, puis Midi, s'envolent.
 //  Dialogues : assets/data/clients/chatboite.json
 // ============================================================
@@ -32,7 +33,8 @@ RM.CHAPTERS[0] = {
   },
 
   // Ausculter : Midi secoue le client (aussi rejoué à la fin).
-  // replay = true : fin réussie, Midi vient de crier « ON VA LE SECOUER ! »
+  // replay = true : fin réussie, Midi vient de crier « ON VA LE SECOUER ! » (avec le chrono caché)
+  // Renvoie le résultat de la secousse : { fast }
   async shakeGame(s, replay = false)
   {
     const L = s.client.ausculte;
@@ -50,7 +52,9 @@ RM.CHAPTERS[0] = {
       s.clientSprite.setVisible(false);
     }
 
-    await s.activity((h) => new RM.ShakeAct(s, s.area, s.client, h));
+    const res = await s.activity(
+      (h) => new RM.ShakeAct(s, s.area, s.client, h, { timeLimit: replay ? RM.SHAKE_TIME_LIMIT : 0 }),
+    );
 
     if (s.clientSprite)
     {
@@ -60,6 +64,22 @@ RM.CHAPTERS[0] = {
     await s.tween({ targets: s.minuit, x: s.pos.minuit, duration: 450, ease: 'Quad.easeOut' }); // revient en courant
     s.cameras.main.shake(200, 0.006);
     await s.dialog(s.fill(L.stop)); // « Arrête ! »
+    return res;
+  },
+
+  // Secoué assez vite : Chat-boîte saute hors de sa boîte et devient Chracula
+  async chraculaOut(s)
+  {
+    const C = s.client.chracula,
+      c = s.clientSprite;
+
+    RM.Sfx.pop();
+    await s.tween({ targets: c, y: c.y - 60, duration: 180, yoyo: true, ease: 'Quad.easeOut' });
+    RM.sparkle(s, c.x, c.y - 90, RM.C.gold, 26);
+    c.play('chracula_idle');
+    s.clientName = C.name;
+    s.vars.client = C.name;
+    await s.dialog(s.fill(C.out));
   },
 
   // La fin du chapitre : réussie ou ratée
@@ -71,8 +91,18 @@ RM.CHAPTERS[0] = {
     {
       await s.potionWorks();
       await s.dialog(s.fill(s.client.success)); // il ne veut pas sortir… « ON VA LE SECOUER ! »
-      await this.shakeGame(s, true);
-      s.finishChapter(true, 'healed');
+
+      const res = await this.shakeGame(s, true);
+
+      if (res && res.fast)
+      {
+        await this.chraculaOut(s);
+        s.finishChapter(true, 'chracula');
+      }
+      else
+      {
+        s.finishChapter(true, 'healed');
+      }
     }
     else
     {

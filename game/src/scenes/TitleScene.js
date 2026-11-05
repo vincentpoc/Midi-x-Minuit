@@ -107,7 +107,7 @@ RM.TitleScene = class extends Phaser.Scene
 
     // les clients restent sur le menu dans la forme de leur dernier chapitre :
     // soignés (Chat-boîte, Cookie qui dort), ratés (Chat-boîte qui flotte,
-    // pot de beurre de cacahuète) ou… Cookie transformé en cookie.
+    // pot de beurre de cacahuète) ou… Cookie transformé en cookie, Chat-boîte devenu Chracula.
     const spots = [
       [590, G],
       [660, G - 110],
@@ -150,6 +150,10 @@ RM.TitleScene = class extends Phaser.Scene
         key = 'cookie_midi';
         scale = 2.2;
         foot = 0.9;
+      }
+      else if (st === 'chracula')
+      {
+        key = 'chracula'; // secoué assez vite à la fin du chapitre 1
       }
       else if (st === 'burned')
       {

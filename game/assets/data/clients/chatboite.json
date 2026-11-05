@@ -16,6 +16,7 @@
     "aaah": { "who": "client", "text": "Aaah, aaah, aaah !" },
     "upDown": { "who": "midi", "text": "Peut-être de haut en bas ?" },
     "tap": { "who": "midi", "text": "Peut-être qu'en tapant dessus, ça va marcher ?" },
+    "faster": { "who": "midi", "text": "Plus vite !" },
     "stop": [
       { "who": "minuit", "text": "Arrête !" }
     ],
@@ -30,6 +31,13 @@
     { "who": "client", "text": "Ah, je suis bien dans ma boîte. Finalement, je vais rester dedans." },
     { "who": "midi", "text": "ON VA LE SECOUER !" }
   ],
+  "chracula": {
+    "name": "Chracula",
+    "out": [
+      { "who": "client", "text": "Aaaah ! Enfin libre ! Appelez-moi Chracula !" },
+      { "who": "midi", "text": "Il était coincé là-dedans depuis le Moyen Âge ou quoi ?" }
+    ]
+  },
   "fail": [
     { "who": "client", "text": "Pourquoi je flotte ? C'est ça, ta potion de décollage ?!" },
     { "who": "midi", "text": "Moi aussi, moi aussi !" }

@@ -1,22 +1,22 @@
 // ============================================================
-//  BoxesAct — Les boîtes (division, chapitre 1) : « Range 24 citrouilles dans
-// 3 boîtes : quelle taille de boîte ? » Un seul bouton − / + qui
-// double (ou divise par deux) la taille : 2 → 4 → 8 places.
-//  Erreur : on garde ses boîtes (cases vides si trop grandes, ingrédients en trop posés
-//  en vrac par-dessus si trop petites), sa taille en rouge et la bonne en vert à côté.
+//  BoxesAct — Les boîtes (division, chapitre 1) : « Range les 24 citrouilles dans
+//  des boîtes de 4 : combien de boîtes ? » La taille est imposée (2, 4 ou 8 places),
+//  un bouton − / + choisit le nombre de boîtes (de 1 à 10).
+//  Erreur : on garde ses boîtes (cases vides s'il y en a trop, ingrédients en trop posés
+//  en vrac par-dessus s'il en manque), son nombre en rouge et le bon en vert à côté.
 //  Les hooks viennent de StoryScene (voir hooks() dans StoryScene.js).
 // ============================================================
 
 RM.BoxesAct = class
 {
-  // q = { ing, t (bonne taille), k (nombre de boîtes), N }
+  // q = { ing, t (taille des boîtes), k (bon nombre de boîtes), N }
   constructor(scene, area, q, hooks)
   {
     this.scene = scene;
     this.A = area;
     this.q = q;
     this.hooks = hooks;
-    this.size = 2;
+    this.count = 1;
     this.filled = false;
     this.locked = false;
     this.root = scene.add.container(0, 0);
@@ -38,29 +38,29 @@ RM.BoxesAct = class
       RM.text(s, A.x + 110, A.y + 52, `${q.N} ${q.ing.plural}`, 36, RM.C.ink).setOrigin(0, 0.5),
     );
 
-    R.add(RM.text(s, A.x + A.w - 36, A.y + 52, `${q.k} boîtes`, 36, '#6b4f7f').setOrigin(1, 0.5));
+    R.add(RM.text(s, A.x + A.w - 36, A.y + 52, `boîtes de ${q.t}`, 36, '#6b4f7f').setOrigin(1, 0.5));
     this.boxLayer = s.add.container(0, 0);
     R.add(this.boxLayer);
     this.status = RM.text(s, A.x + A.w / 2, A.y + 430, '', 30, '#6b4f7f');
     R.add(this.status);
 
-    // − boîte de N +
+    // − nombre de boîtes +
     const y = A.y + 530;
     const g = s.add.graphics();
 
     g.fillStyle(0xffffff, 0.85).fillRoundedRect(A.x + A.w / 2 - 110, y - 52, 220, 104, 20);
     g.lineStyle(4, RM.C.purple, 0.8).strokeRoundedRect(A.x + A.w / 2 - 110, y - 52, 220, 104, 20);
     R.add(g);
-    R.add(RM.text(s, A.x + A.w / 2, y - 26, 'boîte de', 26, '#6b4f7f'));
-    this.sizeText = RM.text(s, A.x + A.w / 2, y + 16, '2', 52, RM.C.ink);
-    R.add(this.sizeText);
+    R.add(RM.text(s, A.x + A.w / 2, y - 26, 'boîtes', 26, '#6b4f7f'));
+    this.countText = RM.text(s, A.x + A.w / 2, y + 16, String(this.count), 52, RM.C.ink);
+    R.add(this.countText);
     this.minus = RM.roundButton(s, A.x + A.w / 2 - 190, y, 44, '−', () => this.change(-1));
     this.plus = RM.roundButton(s, A.x + A.w / 2 + 190, y, 44, '+', () => this.change(+1));
     R.add([this.minus, this.plus]);
     this.draw();
   }
 
-  // Double (d > 0) ou divise par deux (d < 0) la taille des boîtes, de 2 à 8
+  // Ajoute (d = 1) ou retire (d = -1) une boîte, de 1 à 10
   change(d)
   {
     if (this.locked)
@@ -68,18 +68,18 @@ RM.BoxesAct = class
       return;
     }
 
-    const v = Phaser.Math.Clamp(d > 0 ? this.size * 2 : this.size / 2, 2, 8);
+    const v = Phaser.Math.Clamp(this.count + d, 1, 10);
 
-    if (v === this.size)
+    if (v === this.count)
     {
       RM.Sfx.tick();
       return;
     }
 
-    this.size = v;
+    this.count = v;
     RM.Sfx.tap();
-    this.sizeText.setText(String(v));
-    this.scene.tweens.add({ targets: this.sizeText, scale: 1.3, duration: 120, yoyo: true });
+    this.countText.setText(String(v));
+    this.scene.tweens.add({ targets: this.countText, scale: 1.3, duration: 120, yoyo: true });
     this.draw();
   }
 
@@ -99,7 +99,8 @@ RM.BoxesAct = class
 
     L.removeAll(true);
 
-    const { c, r } = this.shape(this.size);
+    const { c, r } = this.shape(q.t);
+    const n = this.count;
 
     // les cases rétrécissent si les boîtes ne tiennent pas dans la zone (300 px de haut)
     let cell = 34,
@@ -113,8 +114,8 @@ RM.BoxesAct = class
     {
       bw = c * cell + pad * 2;
       bh = r * cell + pad * 2 + 8;
-      perRow = Math.max(1, Math.min(q.k, Math.floor((A.w - 40) / (bw + 16))));
-      rows = Math.ceil(q.k / perRow);
+      perRow = Math.max(1, Math.min(n, Math.floor((A.w - 40) / (bw + 16))));
+      rows = Math.ceil(n / perRow);
       cell -= 2;
     }
     while (rows * (bh + 14) > 300 && cell > 16);
@@ -124,12 +125,12 @@ RM.BoxesAct = class
     let placed = 0;
     const zone = { x1: Infinity, x2: -Infinity, y1: top, y2: top };
 
-    for (let b = 0; b < q.k; b++)
+    for (let b = 0; b < n; b++)
     {
       const row = Math.floor(b / perRow),
         col = b % perRow;
 
-      const inRow = Math.min(perRow, q.k - row * perRow);
+      const inRow = Math.min(perRow, n - row * perRow);
       const x = A.x + A.w / 2 - (inRow * (bw + 16) - 16) / 2 + col * (bw + 16);
       const y = top + row * (bh + 14);
       const g = s.add.graphics();
@@ -143,7 +144,7 @@ RM.BoxesAct = class
       g.fillStyle(0xc08a52, 1).fillRoundedRect(x, y, bw, bh - 4, 8);
       g.fillStyle(0xa8744a, 1).fillRect(x + 4, y + 4, bw - 8, 6);
 
-      for (let i = 0; i < this.size; i++)
+      for (let i = 0; i < q.t; i++)
       {
         const cx = x + pad + (i % c) * cell,
           cy = y + pad + 6 + Math.floor(i / c) * cell;
@@ -162,8 +163,8 @@ RM.BoxesAct = class
 
     if (this.filled)
     {
-      // boîtes trop petites : les ingrédients en trop sont posés en vrac par-dessus,
-      // comme si Midi avait surchargé les boîtes (boîtes trop grandes : les cases restent vides)
+      // pas assez de boîtes : les ingrédients en trop sont posés en vrac par-dessus,
+      // comme si Midi avait surchargé les boîtes (trop de boîtes : les cases restent vides)
       if (!this.extra)
       {
         this.extra = [];
@@ -193,11 +194,11 @@ RM.BoxesAct = class
     }
     else
     {
-      this.status.setText('Choisis la taille des boîtes avec − et +').setColor('#6b4f7f');
+      this.status.setText('Choisis le nombre de boîtes avec − et +').setColor('#6b4f7f');
     }
   }
 
-  // Valider : la bonne taille félicite ; sinon, on montre la bonne taille puis la correction
+  // Valider : le bon nombre félicite ; sinon, on montre le bon nombre puis la correction
   validate()
   {
     if (this.locked)
@@ -211,17 +212,17 @@ RM.BoxesAct = class
     this.plus.setEnabled(false);
 
     const q = this.q;
-    const ok = this.size === q.t;
+    const ok = this.count === q.k;
 
     this.filled = true;
     this.draw();
-    RM.Progress.record(q.t, q.k, ok, 'divk'); // écrit « N ÷ k »
+    RM.Progress.record(q.t, q.k, ok, 'div'); // écrit « N ÷ t »
 
     if (ok)
     {
       RM.Sfx.good();
       RM.sparkle(this.scene, this.A.x + this.A.w / 2, this.A.y + 250, RM.C.gold, 18);
-      this.caption(`${q.N} ÷ ${q.k} = ${q.t}`);
+      this.caption(`${q.N} ÷ ${q.t} = ${q.k}`);
       this.hooks.midi('brag');
       this.hooks.pause(2000, () => this.hooks.done({}));
     }
@@ -231,9 +232,9 @@ RM.BoxesAct = class
       this.hooks.error();
       this.hooks.midi('mock');
 
-      // on garde ses boîtes ; sa taille passe en rouge, la bonne s'écrit en vert à côté,
+      // on garde ses boîtes ; son nombre passe en rouge, le bon s'écrit en vert à côté,
       // puis la bonne opération sous les boîtes
-      this.sizeText.setColor(RM.BAD);
+      this.countText.setColor(RM.BAD);
 
       this.scene.time.delayedCall(1300, () =>
       {
@@ -244,21 +245,21 @@ RM.BoxesAct = class
 
         const A = this.A;
 
-        const fix = RM.text(this.scene, A.x + A.w / 2 + 70, A.y + 520, String(q.t), 56, RM.GOOD)
+        const fix = RM.text(this.scene, A.x + A.w / 2 + 70, A.y + 520, String(q.k), 56, RM.GOOD)
           .setAngle(-6)
           .setScale(0);
 
         this.root.add(fix);
         RM.Sfx.pop();
         this.scene.tweens.add({ targets: fix, scale: 1, duration: 260, ease: 'Back.easeOut' });
-        this.caption(`${q.N} ÷ ${q.k} = ${q.t}`);
+        this.caption(`${q.N} ÷ ${q.t} = ${q.k}`);
       });
 
       this.scene.time.delayedCall(2600, () =>
       {
         if (!this.dead)
         {
-          this.hooks.correct(`${q.N} ÷ ${q.k}`, q.t, () => this.hooks.done({}));
+          this.hooks.correct(`${q.N} ÷ ${q.t}`, q.k, () => this.hooks.done({}));
         }
       });
     }

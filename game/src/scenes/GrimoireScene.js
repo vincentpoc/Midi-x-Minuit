@@ -1,7 +1,8 @@
 // ============================================================
 //  GrimoireScene — la carte de progression.
-//  Une page par table ; chaque calcul a 3 étoiles : a × b, b × a
+//  Une page par table (× 2 à × 10) ; chaque calcul a 3 étoiles : a × b, b × a
 //  et la division. Les résultats sont toujours écrits (gris si jamais faits).
+//  Étoile brisée : le dernier essai de ce calcul est raté.
 // ============================================================
 
 RM.GrimoireScene = class extends Phaser.Scene
@@ -63,7 +64,7 @@ RM.GrimoireScene = class extends Phaser.Scene
     this.cameras.main.fadeIn(250, 0, 0, 0);
   }
 
-  // Affiche la page de la table t : ses 10 calculs, leurs étoiles et sa lune
+  // Affiche la page de la table t : ses 9 calculs, leurs étoiles et sa lune
   show(t)
   {
     const c = this.content,
@@ -74,28 +75,18 @@ RM.GrimoireScene = class extends Phaser.Scene
     c.removeAll(true);
     c.add(RM.text(this, RM.W / 2 - 6, oy + 16 * S, `Table de ${t}`, 40, RM.C.ink));
 
-    // les 10 calculs : le résultat est toujours écrit (gris si elle ne l'a jamais fait)
-    for (let k = 1; k <= 10; k++)
+    // les 9 calculs : le résultat est toujours écrit (gris s'il n'a jamais été fait)
+    for (let k = 2; k <= 10; k++)
     {
       const seen = !!RM.Progress.data.facts[RM.Progress.key(t, k)];
-      const y = oy + 25 * S + (k - 1) * 37;
+      const y = oy + 25 * S + (k - 2) * 41;
 
       c.add(
         RM.text(this, ox + 22 * S, y, `${t} × ${k} = ${t * k}`, 32, seen ? RM.C.ink : '#a08a70').setOrigin(0, 0.5),
       );
 
-      // 3 étoiles : t × k réussi, k × t réussi, une division réussie
-      RM.Progress.stars(t, k).forEach((on, i) =>
-      {
-        const st = this.add.image(ox + 60 * S + i * 32, y, 'ui_star').setScale(0.8);
-
-        if (!on)
-        {
-          st.setAlpha(0.18).setTint(0x8a7a6a);
-        }
-
-        c.add(st);
-      });
+      // 3 étoiles : t × k, k × t et la division
+      RM.Progress.stars(t, k).forEach((state, i) => this.addStar(ox + 60 * S + i * 32, y, state));
     }
 
     const m = RM.Progress.moon(t);
@@ -105,10 +96,41 @@ RM.GrimoireScene = class extends Phaser.Scene
         this,
         RM.W / 2 - 6,
         oy + 85 * S,
-        m >= 1 ? 'Lune pleine !' : `Réussis : ${Math.round(m * 10)} / 10`,
+        m >= 1 ? 'Lune pleine !' : `Réussis : ${Math.round(m * 9)} / 9`,
         28,
         '#7a3fa0',
       ),
     );
+  }
+
+  // Dessine une étoile : dorée ('ok'), rouge et fendue ('broken') ou éteinte (null)
+  addStar(x, y, state)
+  {
+    const c = this.content;
+    const st = this.add.image(x, y, 'ui_star').setScale(0.8);
+
+    c.add(st);
+
+    if (!state)
+    {
+      st.setAlpha(0.18).setTint(0x8a7a6a);
+    }
+
+    if (state === 'broken')
+    {
+      st.setTint(0xe0483e);
+
+      // la fente en zigzag, du haut vers le bas de l'étoile
+      const crack = this.add.graphics();
+
+      crack.lineStyle(3, 0x2a0d12, 1);
+      crack.beginPath();
+      crack.moveTo(x + 2, y - 13);
+      crack.lineTo(x - 3, y - 4);
+      crack.lineTo(x + 3, y + 1);
+      crack.lineTo(x - 2, y + 12);
+      crack.strokePath();
+      c.add(crack);
+    }
   }
 };

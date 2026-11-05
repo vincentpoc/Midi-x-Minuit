@@ -149,9 +149,15 @@ RM.C = {
 // Les planches animées des clients, chargées par BootScene (Chat-boîte seulement pour l'instant ;
 // Chat-cacahuète et Cookie sont des images fixes, chargées directement dans BootScene).
 // fw/fh = taille d'une frame dans la planche ; frames = nb de frames d'animation
-// Autres chats (Comte Moustache = dracula, Nuage = cream, Charbon = gray) : dans MagicRevision\Assets
+// Autres chats (Nuage = cream, Charbon = gray) : dans MagicRevision\Assets
 // (CatPack) : copier la planche dans assets/chars/ puis ajouter une ligne ici.
-RM.CLIENTS = [{ key: 'boxcat', fw: 32, fh: 32, frames: 4, scale: 5, fps: 4, footY: 0.95 }];
+RM.CLIENTS = [
+  { key: 'boxcat', fw: 32, fh: 32, frames: 4, scale: 5, fps: 4, footY: 0.95 },
+  { key: 'chracula', fw: 32, fh: 32, frames: 6, scale: 5, fps: 6, footY: 0.95 }, // Chat-boîte sorti de sa boîte
+];
+
+// Fin du chapitre 1 : le temps pour finir les 3 gestes de la secousse (Chat-boîte devient Chracula)
+RM.SHAKE_TIME_LIMIT = 10000; // en ms, le chrono est caché et part au premier geste
 
 // ---------- Outils ----------
 // Un élément au hasard

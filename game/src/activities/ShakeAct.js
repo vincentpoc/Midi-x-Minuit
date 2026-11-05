@@ -2,14 +2,16 @@
 //  ShakeAct — Ausculter Chat-boîte : c'est Midi qui « soigne ».
 //    Gauche-droite × 4, puis haut-bas × 4 (boîte la tête en bas, 180°),
 //    puis 4 taps, toujours la tête en bas (la boîte grossit et rétrécit).
-//    lines = client.ausculte (tickle, aaah, upDown, tap)
+//    lines = client.ausculte (tickle, aaah, upDown, tap, faster)
+//    opts.timeLimit (ms) : chrono caché, à partir du premier geste. À la moitié du temps,
+//    Midi crie « Plus vite ! ». done({ fast }) dit si les 3 gestes sont finis à temps.
 //  Les hooks viennent de StoryScene (voir hooks() dans StoryScene.js).
 // ============================================================
 
 RM.ShakeAct = class
 {
   // Construit la boîte, les marques de progression et la zone de geste
-  constructor(scene, area, client, hooks)
+  constructor(scene, area, client, hooks, opts = {})
   {
     this.scene = scene;
     this.A = area;
@@ -24,6 +26,8 @@ RM.ShakeAct = class
     this.dir = 0;
     this.travel = 0;
     this.finished = false;
+    this.timeLimit = opts.timeLimit || 0;
+    this.startTime = 0;
 
     const s = scene,
       A = area,
@@ -82,6 +86,25 @@ RM.ShakeAct = class
     });
   }
 
+  // Le premier geste lance le chrono caché, et Midi crie « Plus vite ! » à la moitié du temps
+  startClock()
+  {
+    if (!this.timeLimit || this.startTime)
+    {
+      return;
+    }
+
+    this.startTime = this.scene.time.now;
+
+    this.fasterTimer = this.scene.time.delayedCall(this.timeLimit / 2, () =>
+    {
+      if (!this.finished)
+      {
+        this.hooks.say(this.L.faster.who, this.L.faster.text);
+      }
+    });
+  }
+
   // un « coup » = un déplacement d'au moins STROKE px dans un sens ; une secousse = 2 coups
   onMove(p)
   {
@@ -89,6 +112,8 @@ RM.ShakeAct = class
     {
       return;
     }
+
+    this.startClock();
 
     const lr = this.phase === 'lr';
     const d = lr ? p.x - p.prevPosition.x : p.y - p.prevPosition.y;
@@ -260,16 +285,24 @@ RM.ShakeAct = class
     }
   }
 
-  // Les 3 gestes sont faits : fin de l'activité
+  // Les 3 gestes sont faits : fin de l'activité (fast = finis avant la fin du chrono)
   finish()
   {
     this.finished = true;
-    this.scene.time.delayedCall(500, () => this.hooks.done({}));
+
+    const fast = !!this.timeLimit && this.scene.time.now - this.startTime <= this.timeLimit;
+
+    this.scene.time.delayedCall(500, () => this.hooks.done({ fast }));
   }
 
   // Enlève l'activité de l'écran
   destroy()
   {
+    if (this.fasterTimer)
+    {
+      this.fasterTimer.remove();
+    }
+
     this.root.destroy();
   }
 };

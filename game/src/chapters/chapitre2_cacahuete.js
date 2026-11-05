@@ -2,11 +2,11 @@
 //  Chapitre 2 — Chat-cacahuète, qui redevient Cookie (table de 3).
 //
 //  Ausculter : la poursuite (Midi veut croquer Chat-cacahuète, elle l'éloigne).
-//  Recette : 2 séries de 3 × 1 à 3 × 6, puis 3 × 7, 3 × 8 et 3 × 9 avec les
+//  Recette : 2 séries de 3 × 2 à 3 × 6 et 3 × 10, puis 3 × 7, 3 × 8 et 3 × 9 avec les
 //    goûters de Midi (sans pénalité) ; s'il y a eu des erreurs, on les refait
 //    avec les vrais ingrédients (et là, ça compte).
 //  Midi a faim et part au marché ; il revient avec « un petit quelque chose ».
-//  Bouillon (3-6-9 ml), étagère (on y retrouve son cookie perdu), bulles par 3
+//  Bouillon (3-6-9 ml), étagère de 2 à 5 rangées (on y retrouve son cookie perdu), bulles par 3
 //    (3 × 10 y est toujours).
 //  Potion réussie : il redevient Cookie, le chat roux, qui veut le cookie de Midi
 //    (la poursuite à l'envers). Potion ratée : le client, puis Midi, deviennent
@@ -21,7 +21,10 @@ RM.CHAPTERS[1] = {
   // Midi a perdu son cookie dans un sac de courses : on le retrouve sur l'étagère
   midiCookie: true,
 
-  // 3 × 10 n'est ni dans la recette ni toujours au bouillon : il est toujours dans les bulles
+  // L'étagère de ce chapitre reste facile : de 2 à 5 rangées (6, 9, 12 et 15 ingrédients)
+  shelf: { minK: 2, maxK: 5, minN: 6, maxN: 15 },
+
+  // 3 × 10 est dans la recette ; on le retrouve aussi toujours dans les bulles
   mustPractice: [{ t: 3, k: 10 }],
 
   // Le déroulement du chapitre, dans l'ordre de l'histoire
@@ -44,11 +47,11 @@ RM.CHAPTERS[1] = {
     await this.potion(s);
   },
 
-  // La recette : 2 séries de 3 × 1 à 3 × 6 (six calculs différents), puis les goûters de Midi : 3 × 7, 3 × 8, 3 × 9
+  // La recette : 2 séries avec 3 × 2 à 3 × 6 et 3 × 10 (six calculs différents), puis les goûters de Midi : 3 × 7, 3 × 8, 3 × 9
   makeRecipe(s)
   {
     const t = s.tables[0];
-    const ks = RM.shuffle([1, 2, 3, 4, 5, 6]);
+    const ks = RM.shuffle([2, 3, 4, 5, 6, 10]);
     const snacks = RM.shuffle(RM.STORY.snacks);
 
     const line = (ing, k, snack) => ({ ing, t, k, N: t * k, snack });

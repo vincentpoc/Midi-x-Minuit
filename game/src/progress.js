@@ -33,6 +33,7 @@ RM.Progress = {
       last: null, // dernier chapitre : { client, success, chapter } (Midi qui vole encore, client qui part…)
       chaptersPlayed: 0, // nombre de chapitres joués
       stars: {}, // calculs réussis au moins une fois, par écriture : « 4×2 », « 2×4 », « 8÷2 » (grimoire)
+      brokenStars: {}, // écritures dont le dernier essai est raté (étoile brisée du grimoire)
     };
   },
 
@@ -127,34 +128,47 @@ RM.Progress = {
   },
 
   // L'écriture d'un calcul pour les étoiles du grimoire.
-  // kind : 'ab' = « t × k », 'ba' = « k × t », 'div' = « tk ÷ t », 'divk' = « tk ÷ k »
+  // kind : 'ab' = « t × k », 'ba' = « k × t », 'div' = « tk ÷ t »
   expr(t, k, kind)
   {
-    return kind === 'ab'
-      ? `${t}×${k}`
-      : kind === 'ba'
-        ? `${k}×${t}`
-        : kind === 'divk'
-          ? `${t * k}÷${k}`
-          : `${t * k}÷${t}`;
+    return kind === 'ab' ? `${t}×${k}` : kind === 'ba' ? `${k}×${t}` : `${t * k}÷${t}`;
   },
 
-  // Les 3 étoiles d'une ligne du grimoire « a × b » : [a × b réussi, b × a réussi, une division réussie]
+  // Les 3 étoiles d'une ligne du grimoire « a × b » : a × b, b × a et la division (÷ a ou ÷ b).
+  // Chacune vaut 'broken' (dernier essai raté), 'ok' (réussie) ou null (jamais réussie).
   stars(a, b)
   {
-    const S = this.data.stars || {};
+    const S = this.data.stars,
+      B = this.data.brokenStars;
 
-    return [!!S[`${a}×${b}`], !!S[`${b}×${a}`], !!(S[`${a * b}÷${a}`] || S[`${a * b}÷${b}`])];
+    const state = (ids) =>
+      ids.some((id) => B[id]) ? 'broken' : ids.some((id) => S[id]) ? 'ok' : null;
+
+    return [
+      state([`${a}×${b}`]),
+      state([`${b}×${a}`]),
+      state([`${a * b}÷${a}`, `${a * b}÷${b}`]),
+    ];
   },
 
   // Enregistre une réponse : monte ou redescend le niveau du fait, puis sauvegarde.
-  // kind (voir expr) : quelle écriture du calcul a été réussie, pour les étoiles du grimoire
+  // kind (voir expr) : quelle écriture du calcul a été tentée, pour les étoiles du grimoire
+  // (une réussite répare l'étoile, une erreur la brise ; sans kind, les étoiles ne changent pas)
   record(t, k, success, kind)
   {
-    if (success && kind)
+    if (kind)
     {
-      this.data.stars = this.data.stars || {};
-      this.data.stars[this.expr(t, k, kind)] = true;
+      const id = this.expr(t, k, kind);
+
+      if (success)
+      {
+        this.data.stars[id] = true;
+        delete this.data.brokenStars[id];
+      }
+      else
+      {
+        this.data.brokenStars[id] = true;
+      }
     }
 
     if (this.onRecord)
@@ -181,17 +195,17 @@ RM.Progress = {
     this.save();
   },
 
-  // Moyenne de maîtrise d'une table (0 à 4)
+  // Moyenne de maîtrise d'une table (0 à 4), de × 2 à × 10
   avg(t)
   {
     let s = 0;
 
-    for (let k = 1; k <= 10; k++)
+    for (let k = 2; k <= 10; k++)
     {
       s += this.level(t, k);
     }
 
-    return s / 10;
+    return s / 9;
   },
 
   // Choisit une table dans une liste, en privilégiant les plus faibles.
@@ -213,13 +227,13 @@ RM.Progress = {
     return pool[pool.length - 1];
   },
 
-  // Lune d'une table : part des 10 calculs déjà réussis au moins une fois (0 à 1).
+  // Lune d'une table : part des 9 calculs (× 2 à × 10) déjà réussis au moins une fois (0 à 1).
   // Lune pleine = toute la table a été réussie.
   moon(t)
   {
     let n = 0;
 
-    for (let k = 1; k <= 10; k++)
+    for (let k = 2; k <= 10; k++)
     {
       const f = this.get(t, k);
 
@@ -229,7 +243,7 @@ RM.Progress = {
       }
     }
 
-    return n / 10;
+    return n / 9;
   },
 
   // La lune moyenne de plusieurs tables (0 à 1)
@@ -244,17 +258,17 @@ RM.Progress = {
     return tables.reduce((a, t) => a + this.avg(t), 0) / tables.length;
   },
 
-  // Choisit un multiplicateur k pour la table t (privilégie les faits faibles / à revoir).
-  pickK(t, avoid = [])
+  // Choisit un multiplicateur k de 2 à 10 pour la table t (privilégie les faits faibles / à revoir).
+  pickK(t)
   {
     const day = this.data.day;
 
     // Évite de reposer le même fait deux fois dans la même journée
     const used = (this.todayUsed && this.todayUsed[t]) || [];
-    const all = avoid.concat(used.length < 8 ? used : []);
+    const all = used.length < 8 ? used : [];
     const cands = [];
 
-    for (let k = 1; k <= 10; k++)
+    for (let k = 2; k <= 10; k++)
     {
       if (all.includes(k))
       {
@@ -266,12 +280,7 @@ RM.Progress = {
       const due = !f || f.due <= day;
 
       // priorité 1 : les calculs jamais faits ; priorité 2 : ceux à revoir (ratés ou « dus »)
-      let w = !f ? 24 : due ? (5 - lvl) * 2 : 0.5;
-
-      if (k === 1)
-      {
-        w *= 0.25; // 1 × t est trop facile
-      }
+      const w = !f ? 24 : due ? (5 - lvl) * 2 : 0.5;
 
       cands.push({ k, w });
     }

@@ -27,12 +27,12 @@ Object.assign(RM.StoryScene.prototype, {
     const line = (ing) =>
     {
       const t = P.pickFrom(this.tables);
-      const k = P.pickK(t, [1]);
+      const k = P.pickK(t);
 
       return { ing, t, k, N: t * k };
     };
 
-    // le chapitre peut choisir ses calculs (chapitre 2 : 3 × 1 à 3 × 6, puis les goûters de Midi)
+    // le chapitre peut choisir ses calculs (chapitre 2 : 3 × 2 à 3 × 6 et 3 × 10, puis les goûters de Midi)
     this.recipe = this.chapterDef.makeRecipe
       ? this.chapterDef.makeRecipe(this)
       : [
@@ -171,11 +171,6 @@ Object.assign(RM.StoryScene.prototype, {
 
     for (let s = 0; s < RM.SERIES; s++)
     {
-      if (s)
-      {
-        await this.dialog(this.fill(St.recette.again));
-      }
-
       const lines = this.recipe[s];
 
       if (!lines[0].snack)
@@ -253,7 +248,7 @@ Object.assign(RM.StoryScene.prototype, {
       const serie = Math.floor(s / RM.PER_SERIES);
       const t = P.pickFrom(plan[serie % plan.length]);
       const discover = t === this.group.discover;
-      const k = discover ? Phaser.Math.Between(2, 4) : P.pickK(t, [1]);
+      const k = discover ? Phaser.Math.Between(2, 4) : P.pickK(t);
       const bo = RM.CauldronMech.makeMult(t, k);
 
       // une consigne complète au début, « nouvelles fioles » quand la table change, une courte sinon
@@ -261,7 +256,8 @@ Object.assign(RM.StoryScene.prototype, {
 
       prevT = t;
 
-      await this.dialog(this.fill(txt, { n: bo.N, a: t, b: 2 * t, c: 3 * t }));
+      // elle s'affiche en même temps que l'exercice : on ne touche pas l'écran devant un cadre vide
+      this.quickLines(this.fill(txt, { n: bo.N, a: t, b: 2 * t, c: 3 * t }));
 
       const cm = new RM.CauldronMech(this, bo, this.area);
 
@@ -366,7 +362,7 @@ Object.assign(RM.StoryScene.prototype, {
     });
   },
 
-  // Les boîtes : Midi pose ses sacs, on range les ingrédients dans des boîtes de 2, 4 ou 8
+  // Les boîtes : Midi pose ses sacs, on cherche combien il faut de boîtes de 2, 4 ou 8
   async storeInBoxes()
   {
     const St = RM.STORY.steps;
@@ -378,16 +374,11 @@ Object.assign(RM.StoryScene.prototype, {
 
     for (let b = 0; b < RM.SHORT_SERIES * RM.PER_SERIES; b++)
     {
-      if (b && b % RM.PER_SERIES === 0)
-      {
-        await this.dialog(this.fill(St.boites.again));
-      }
-
       const t = RM.pick([2, 2, 4, 4, 8]);
       const k = t === 8 ? Phaser.Math.Between(2, 4) : Phaser.Math.Between(2, 10);
       const q = { ing: flat[b % flat.length].ing, t, k, N: t * k };
 
-      this.say('minuit', RM.fmt(St.boites.ask, { n: q.N, ingredient: q.ing.plural, k }));
+      this.say('minuit', RM.fmt(St.boites.ask, { n: q.N, ingredient: q.ing.plural, t }));
       await this.activity((h) => new RM.BoxesAct(this, this.area, q, h));
     }
 
@@ -419,7 +410,8 @@ Object.assign(RM.StoryScene.prototype, {
     {
       const bag = bags[b];
 
-      await this.dialog(this.fill(St.sacs.intro, { ingredient: bag.ing.plural, n: bag.N }));
+      // la consigne s'affiche en même temps que l'exercice
+      this.quickLines(this.fill(St.sacs.intro, { ingredient: bag.ing.plural, n: bag.N }));
 
       await this.activity(
         (h) =>
@@ -562,10 +554,12 @@ Object.assign(RM.StoryScene.prototype, {
   },
 
   // Les 4 sacs de l'étagère : des calculs de la recette, sans trop gros ni trop petits nombres
-  // (de 3 à 8 rangées, de 12 à 40 ingrédients). On complète au besoin avec d'autres calculs.
+  // (de 3 à 8 rangées, de 12 à 40 ingrédients, sauf si le chapitre a sa limite : chapterDef.shelf).
+  // On complète au besoin avec d'autres calculs.
   shelfBags(recipe, TW)
   {
-    const okB = (t, k) => k >= 3 && k <= 8 && t * k >= 12 && t * k <= 40;
+    const L = this.chapterDef.shelf || { minK: 3, maxK: 8, minN: 12, maxN: 40 };
+    const okB = (t, k) => k >= L.minK && k <= L.maxK && t * k >= L.minN && t * k <= L.maxN;
     const flat = recipe.flat().filter((l) => !l.snack); // pas les goûters de Midi
     const seen = new Set();
 
@@ -589,7 +583,7 @@ Object.assign(RM.StoryScene.prototype, {
     while (bags.length < RM.SHELF_EXERCISES && guard++ < 200)
     {
       const t = RM.pick(TW),
-        k = Phaser.Math.Between(3, 8);
+        k = Phaser.Math.Between(L.minK, L.maxK);
 
       if (!okB(t, k) || seen.has(`${t}x${k}`))
       {

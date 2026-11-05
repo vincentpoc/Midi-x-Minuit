@@ -479,8 +479,8 @@ RM.checkStory = (S) =>
   // les répliques de chaque étape
   const steps = {
     intro: ['start', 'known', 'knownTitle', 'end'],
-    recette: ['intro', 'again', 'missing', 'outro', 'line'],
-    boites: ['intro', 'ask', 'again', 'outro'],
+    recette: ['intro', 'missing', 'outro', 'line'],
+    boites: ['intro', 'ask', 'outro'],
     bouillon: ['intro', 'again', 'series', 'twist', 'outro'],
     review: ['start', 'title'],
     sacs: ['intro', 'outro', 'midiEats', 'midiEatsMinuit'],
@@ -568,7 +568,15 @@ RM.checkStory = (S) =>
               'finalGame.protected',
               'finalGame.caught',
             ]
-          : ['ausculte.tickle', 'ausculte.aaah', 'ausculte.upDown', 'ausculte.tap'],
+          : [
+              'ausculte.tickle',
+              'ausculte.aaah',
+              'ausculte.upDown',
+              'ausculte.tap',
+              'ausculte.faster',
+              'chracula.name',
+              'chracula.out',
+            ],
       ),
     );
   });

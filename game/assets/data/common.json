@@ -40,9 +40,6 @@
         { "who": "midi", "text": "Moi ? Des bêtises ? Jamais !" },
         { "who": "minuit", "text": "Pendant ce temps, je prépare le bouillon de la potion." }
       ],
-      "again": [
-        { "who": "minuit", "text": "Suite de l'ordonnance !" }
-      ],
       "missing": [
         { "who": "minuit", "text": "Oh non ! Il ne reste presque plus d'ingrédients dans la boutique !" }
       ]
@@ -125,12 +122,9 @@
     "boites": {
       "intro": [
         { "who": "minuit", "text": "Pour soigner {client}, il faut ranger les ingrédients dans des boîtes." },
-        { "who": "minuit", "text": "Il va falloir ranger tous ces ingrédients, aide-moi à trouver la bonne taille !" }
+        { "who": "minuit", "text": "Il va falloir ranger tous ces ingrédients, aide-moi à trouver le bon nombre de boîtes !" }
       ],
-      "ask": "Range les {n} {ingredient} dans {k} boîtes : quelle taille de boîte ?",
-      "again": [
-        { "who": "midi", "text": "Encore des ingrédients ! J'ai rapporté tout le marché." }
-      ],
+      "ask": "Range les {n} {ingredient} dans des boîtes de {t} : combien de boîtes ?",
       "outro": [
         { "who": "minuit", "text": "Tout est bien rangé ! On passe au mélange." }
       ]

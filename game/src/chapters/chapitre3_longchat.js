@@ -1,21 +1,21 @@
 // ============================================================
 //  Chapitre 3 — Loooooong-chat (tables de 5 et 10).
 //
-//  Il s'est assis dans la gomme à mâcher géante d'un troll : quand on le tire, il s'étire…
-//  et revient d'un coup (SCHLAC !). Après l'auscultation, il reste allongé dans la boutique
+//  Il a mangé la gomme à mâcher d'un troll : il est devenu tout élastique. Quand on le tire,
+//  il s'étire… et revient d'un coup (SCHLAC !). Le lance-chat revient tout au long du chapitre,
+//  et la boutique est de plus en plus en désordre (RM.Mess). Après l'auscultation, il reste allongé dans la boutique
 //  et grandit à chaque calcul, jusqu'à sortir de l'écran (derrière l'interface).
 //
 //  Ausculter : le lance-chat à rebonds (SlingAct).
-//  Recette : série 1 en 5, série 2 en 10 (et un 5), série 3 = révision des chapitres 1 et 2
-//    (tables de 2, 3 et 4), les calculs les moins sûrs d'abord.
-//  Multiplication : étirer Long-chat (StretchAct, sans vies) — remplace le bouillon.
+//  Recette : seulement du 5 et du 10.
+//  Multiplication : étirer Long-chat, le chat est le slider (StretchAct) — remplace le bouillon.
 //  Division : le minuteur, ÷ 5 seulement (TimerAct) — remplace les boîtes.
 //  Mélange : la chasse aux goûters en haut de l'armoire (SnackHuntAct) — remplace les bulles.
-//  Potion réussie : il se ratatine comme un élastique lâché des deux côtés et redevient un chat normal.
-//  Potion ratée : il fond en flaque (failMelt), puis se relève replié en accordéon
-//    (Chat-cordéon, des notes sortent quand il parle) ;
-//    on rejoue le lance-chat avec lui. Midi ne boit pas la potion dans ce chapitre :
-//    failDrink = avant de relancer Chat-cordéon, failFly = après.
+//  Les 4 fins (comme pour chaque client) :
+//    explosée (0 vie) : tout noir · ratée (5 vies ou moins) : il fond en flaque (failed)
+//    réussie : la potion n'est pas parfaite, il se replie en accordéon (Chat-cordéon) et s'enfuit.
+//      Jeu de fin : l'attraper et l'étirer 5 fois à temps (SlingAct, opts.run).
+//      trop lent : il reste Chat-cordéon (cordeon) · réussi : il reprend son apparence (healed)
 //  Dialogues : assets/data/clients/longchat.json
 // ============================================================
 
@@ -26,6 +26,8 @@ RM.CHAPTERS[2] = {
   // Long-chat allongé : taille des morceaux et croissance
   LC_SCALE: 3.4,
   GROW: 14, // px de plus à chaque calcul
+  FINAL_LAUNCHES: 5, // jeu de fin : nombre de fois où il faut l'étirer et le lancer
+  FINAL_TIME: 16000, // … et le temps pour y arriver (ms, sans compter ses vols)
   MAX_LEN: 1100,
 
   async run(s)
@@ -56,40 +58,18 @@ RM.CHAPTERS[2] = {
     await this.potion(s);
   },
 
-  // La recette : 5, puis 10, puis la révision des chapitres précédents
+  // La recette : seulement du 5 et du 10 (des calculs d'autres chapitres seraient un piège)
   makeRecipe(s)
   {
     const ks5 = RM.shuffle([2, 3, 4, 5, 6, 7, 8, 9, 10]);
-    const ks10 = RM.shuffle([2, 3, 4, 5, 6, 7, 8, 9]);
+    const ks10 = RM.shuffle([2, 3, 4, 5, 6, 7, 8, 9, 10]);
     const line = (ing, t, k) => ({ ing, t, k, N: t * k });
-
-    // révision : les calculs des tables 2, 3 et 4 les moins sûrs (niveau du grimoire), un peu de hasard
-    const old = [];
-
-    [2, 3, 4].forEach((t) =>
-    {
-      for (let k = 2; k <= 10; k++)
-      {
-        old.push({ t, k, lvl: RM.Progress.level(t, k) + Math.random() * 1.5 });
-      }
-    });
-
-    old.sort((a, b) => a.lvl - b.lvl);
-
-    const rev = [];
-
-    old.forEach((f) =>
-    {
-      if (rev.length < 3 && !rev.some((r) => r.t === f.t))
-      {
-        rev.push(f);
-      }
-    });
+    const mix = RM.shuffle(s.ings);
 
     return [
       s.ings.slice(0, 3).map((ing, i) => line(ing, 5, ks5[i])),
-      [line(s.ings[3], 10, ks10[0]), line(s.ings[4], 10, ks10[1]), line(s.ings[5], 5, ks5[3])],
-      RM.shuffle(s.ings).slice(0, 3).map((ing, i) => line(ing, rev[i].t, rev[i].k)),
+      s.ings.slice(3, 6).map((ing, i) => line(ing, 10, ks10[i])),
+      [line(mix[0], 5, ks5[3]), line(mix[1], 10, ks10[3]), line(mix[2], 5, ks5[4])],
     ];
   },
 
@@ -231,9 +211,24 @@ RM.CHAPTERS[2] = {
 
       s.say('minuit', RM.fmt(E.ask, { k: q.k, t: q.t }));
 
+      // le désordre efface le soutien : les nombres tombent au 1er lancer, les traits à la fin de la série 1
       await s.activity(
-        (h) => new RM.StretchAct(s, s.area, q, h, { labels: serie === 0, demo: i === 0, lines: E }),
+        (h) =>
+          new RM.StretchAct(s, s.area, q, h, {
+            first: i === 0,
+            free: i === 0, // la première fois, lâcher par accident ne coûte rien
+            labels: i === 0,
+            ticks: serie === 0,
+            loseLabels: i === 0,
+            loseTicks: i === RM.PER_SERIES - 1,
+            lines: E,
+          }),
       );
+
+      if (i === 0)
+      {
+        await s.dialog(s.fill(E.surprise));
+      }
     }
 
     s.clientSprite.setVisible(true);
@@ -265,7 +260,7 @@ RM.CHAPTERS[2] = {
       }
 
       s.say('minuit', RM.fmt(M.ask, { ingredient: ing.plural, n: q.N }));
-      await s.activity((h) => new RM.TimerAct(s, s.area, q, h, { labels: serie === 0 }));
+      await s.activity((h) => new RM.TimerAct(s, s.area, q, h, { labels: serie === 0, ings: s.ings }));
     }
 
     await s.dialog(s.fill(M.outro));
@@ -356,46 +351,71 @@ RM.CHAPTERS[2] = {
       this.makeLong(s);
     }
 
-    if (s.potionSucceeds())
+    // ratée (5 vies ou moins) : il se ratatine… et fond en flaque
+    if (!s.potionSucceeds())
     {
-      await s.potionWorks();
+      RM.Sfx.bad();
+      await s.wait(400);
       await this.shrink(s);
-      this.makeNormal(s);
-      await this.bounceBack(s);
-      await s.dialog(s.fill(s.client.success));
-      s.finishChapter(true, 'healed');
+      await this.melt(s);
+      await s.dialog(s.fill(s.client.fail));
+      s.finishChapter(false, 'failed');
       return;
     }
 
-    // ratée : même élastique… il fond en flaque, puis se relève replié en accordéon
-    RM.Sfx.bad();
-    await s.wait(400);
+    // réussie… mais pas parfaite : il se ratatine et se replie en accordéon (Chat-cordéon,
+    // des notes sortent quand il parle). Il faut l'étirer pour lui redonner sa forme : il s'enfuit !
+    await s.potionWorks();
     await this.shrink(s);
-    await this.melt(s);
     this.makeNormal(s, 'chatcordeon');
+
+    const realName = s.clientName;
+
     s.clientName = s.client.cordeonName || s.clientName;
     s.vars.client = s.clientName;
     s.clientSayFx = () => this.notes(s, s.clientSprite);
     await this.bounceBack(s);
-    await s.dialog(s.fill(s.client.fail));
-    await s.dialog(s.fill(s.client.failDrink)); // Midi : « Et un Chat-cordéon, ça se lance aussi ? »
+    await s.dialog(s.fill(s.client.success));
 
+    const F = s.client.finalGame;
+
+    await s.dialog(s.fill(F.intro));
     s.clientSprite.setVisible(false);
 
-    await s.activity(
+    const res = await s.activity(
       (h) =>
         new RM.SlingAct(s, s.area, h, {
           key: 'chatcordeon',
-          scale: 2.2,
-          demo: false,
+          scale: 2,
           notes: true,
-          lines: s.client.cordeon,
+          run: true,
+          launches: this.FINAL_LAUNCHES,
+          timeLimit: this.FINAL_TIME,
+          demo: false,
+          lines: F,
         }),
     );
 
-    s.clientSprite.setVisible(true);
-    await s.dialog(s.fill(s.client.failFly));
-    s.finishChapter(false, 'failed');
+    s.clientSprite.setVisible(true).setPosition(s.pos.client, 478);
+
+    // étiré 5 fois à temps : il reprend son apparence
+    if (res && res.ok)
+    {
+      this.makeNormal(s);
+      s.clientName = realName;
+      s.vars.client = realName;
+      s.clientSayFx = null;
+      RM.Sfx.good();
+      RM.sparkle(s, s.clientSprite.x, s.clientSprite.y - 90, RM.C.gold, 26);
+      await this.bounceBack(s);
+      await s.dialog(s.fill(F.win));
+      s.finishChapter(true, 'healed');
+      return;
+    }
+
+    // trop lent : il reste Chat-cordéon
+    await s.dialog(s.fill(F.lose));
+    s.finishChapter(true, 'cordeon');
   },
 
   // Il se ratatine comme un élastique qu'on lâche des deux côtés

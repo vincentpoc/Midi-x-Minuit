@@ -84,6 +84,9 @@ RM.StoryScene = class extends Phaser.Scene
     this.quitBox = null;
     this.clientSayFx = null; // un effet quand le client parle (chapitre 3 : les notes de Chat-cordéon)
     this.lcBody = null; // chapitre 3 : le corps de Long-chat allongé
+    this.messItems = null; // chapitre 3 : les objets tombés (RM.Mess)
+    this.messLevel = 0;
+    this.messPanic = false;
     this.time.paused = false;
     RM.Progress.startDay();
 

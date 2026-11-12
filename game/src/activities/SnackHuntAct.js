@@ -11,7 +11,8 @@
 //    5. Il ouvre la boîte : bonne réponse = un cookie ; mauvaise = un ingrédient
 //       (et une fois, Chat-boîte, qui adore les boîtes).
 //    Pas de boîte touchée à temps : ce n'est pas une erreur, Midi le relance.
-//    Mauvaise boîte : une vie en moins, la bonne boîte brille en vert, Minuit dit la correction.
+//    Mauvaise boîte : une vie en moins ; on ne le sait qu'une fois la boîte ouverte,
+//    Minuit dit alors la correction.
 //  questions = [{ t, k }]
 //  Les hooks viennent de StoryScene (voir hooks() dans StoryScene.js).
 // ============================================================
@@ -491,18 +492,6 @@ RM.SnackHuntAct = class
         this.fall();
       },
     });
-
-    // mauvaise boîte : la bonne brille en vert tout de suite
-    if (box.value !== this.q.answer)
-    {
-      const good = this.boxList.find((b) => b.value === this.q.answer);
-
-      if (good)
-      {
-        good.glow.setFillStyle(RM.CORR_GREEN, 0.35).setStrokeStyle(8, RM.CORR_GREEN, 1);
-        s.tweens.add({ targets: good.glow, alpha: 0.3, duration: 220, yoyo: true, repeat: 4 });
-      }
-    }
   }
 
   // La chute, puis l'atterrissage en ressort

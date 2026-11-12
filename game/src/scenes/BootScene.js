@@ -116,6 +116,9 @@ RM.BootScene = class extends Phaser.Scene
     // 11 tout étiré, 12 debout, 14 bâille. Couché et étiré en trois morceaux (RM.LongCat).
     this.load.spritesheet('longchat', 'assets/chars/longchat.png', { frameWidth: 88, frameHeight: 88 });
 
+    // après l'explosion : la même planche, tout en gris foncé (fabriquée à partir de longchat.png)
+    this.load.spritesheet('longchat_burned', 'assets/chars/longchat_burned.png', { frameWidth: 88, frameHeight: 88 });
+
     [
       ['longchat_front', 'chars/longchat_front.png'],
       ['longchat_mid', 'chars/longchat_mid.png'],
@@ -135,6 +138,10 @@ RM.BootScene = class extends Phaser.Scene
 
     // Objets
     // goûters de Midi (common.json → snacks)
+    // chapitre 3 : les objets qui tombent quand Long-chat met la boutique en désordre
+    // (16 images de 16 px choisies dans Assets/sprites : potions, clés, grenouilles, chaussettes…)
+    this.load.spritesheet('junk', 'assets/items/junk.png', { frameWidth: 16, frameHeight: 16 });
+
     ['cookies', 'pancakes', 'sandwich'].forEach((k) => this.load.image(k, `assets/items/${k}.png`));
 
     this.load.spritesheet('alchemy', 'assets/items/alchemy.png', {
@@ -551,7 +558,9 @@ RM.checkStory = (S) =>
       'recetteOutro',
       'etirer.intro',
       'etirer.ask',
-      'etirer.pull',
+      'etirer.hint',
+      'etirer.hintFirst',
+      'etirer.surprise',
       'etirer.series',
       'etirer.outro',
       'minuteur.intro',
@@ -568,9 +577,13 @@ RM.checkStory = (S) =>
       'chasse.boxcat',
       'chasse.boxcatEnd',
       'chasse.outro',
-      'cordeon.hint',
-      'cordeon.oups',
-      'cordeon.back',
+      'failMelt',
+      'finalGame.intro',
+      'finalGame.hint',
+      'finalGame.oups',
+      'finalGame.back',
+      'finalGame.win',
+      'finalGame.lose',
     ];
 
     need(
@@ -582,8 +595,6 @@ RM.checkStory = (S) =>
         'arrive',
         'success',
         'fail',
-        'failDrink',
-        'failFly',
         'look.sprite',
         'look.scale',
         'look.footY',
@@ -599,6 +610,8 @@ RM.checkStory = (S) =>
           ? sling
           : chase
           ? [
+              'failDrink',
+              'failFly',
               'ausculte.caught',
               'ausculte.released',
               'ausculte.hint',
@@ -620,6 +633,8 @@ RM.checkStory = (S) =>
               'finalGame.caught',
             ]
           : [
+              'failDrink',
+              'failFly',
               'ausculte.tickle',
               'ausculte.aaah',
               'ausculte.upDown',

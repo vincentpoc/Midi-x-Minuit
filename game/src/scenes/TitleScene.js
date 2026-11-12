@@ -141,7 +141,15 @@ RM.TitleScene = class extends Phaser.Scene
         foot = lk.footY,
         green = false;
 
-      if (st === 'healed')
+      // un client peut donner son propre dessin pour chaque fin (chapitre 3 : look.states)
+      const ov = lk.states && lk.states[st];
+
+      if (ov)
+      {
+        key = ov.key;
+        scale = ov.scale || scale;
+      }
+      else if (st === 'healed')
       {
         key = lk.sleeping || lk.healed || lk.sprite;
       }

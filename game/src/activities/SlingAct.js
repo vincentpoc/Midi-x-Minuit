@@ -1,13 +1,19 @@
 // ============================================================
 //  SlingAct — Ausculter Loooooong-chat (chapitre 3) : le lance-chat à rebonds.
-//    On tire le chat en arrière (il reste collé dans la gomme du troll), on lâche :
-//    il part dans l'autre sens, rebondit sur les bords du cadre et, au 3e rebond,
-//    sort du cadre et de l'écran. Midi : « Oups. » Le client revient.
+//    Il est roulé en boule au centre. On le touche et on tire : il s'étire (sa tête suit le doigt,
+//    seul son corps s'allonge : RM.LongCat). On lâche : il part dans l'autre sens en tournant,
+//    rebondit sur les bords du cadre et, au 3e rebond, sort du cadre et de l'écran.
+//    À chaque lancer, des objets tombent (RM.Mess) et Minuit panique. Midi : « Oups. » Le client revient.
 //    D'abord la main fantôme montre le geste, puis 3 lancers. On ne peut pas perdre.
 //  opts.key : le dessin du chat ('longchat' ou 'chatcordeon' pour la fin ratée)
 //  opts.lines : répliques (client.ausculte, ou la fin ratée)
 //  opts.demo : false = pas de main fantôme (la fin ratée)
 //  opts.notes : true = des notes de musique à chaque rebond (Chat-cordéon)
+//  opts.run : true = le jeu de fin : Chat-cordéon s'enfuit en courant, vite et d'un bout à l'autre
+//    du cadre ; il faut l'attraper, l'étirer et le lancer opts.launches fois (5) avant la fin du temps
+//    (opts.timeLimit, en ms, une barre le montre ; le temps ne passe pas pendant qu'il vole).
+//    done({ ok: true }) s'il est lancé assez de fois à temps, done({ ok: false }) sinon.
+//  Chat-cordéon s'étire aussi quand on le tire : ses pieds restent en place, son soufflet s'allonge.
 //  Les hooks viennent de StoryScene (voir hooks() dans StoryScene.js).
 // ============================================================
 
@@ -18,6 +24,9 @@ RM.SLING = {
   minPull: 45, // en dessous, il revient sans partir
   minSpeed: 1250, // px/s (le 3e rebond arrive en moins de 2 s)
   maxSpeed: 1900,
+  runSpeed: 620, // px/s quand il s'enfuit (jeu de fin)
+  runFar: 320, // il repart toujours à au moins cette distance (px) : il ne reste pas au milieu
+  runGrab: 200, // largeur de la zone pour l'attraper quand il court (300 quand il ne bouge pas)
 };
 
 RM.SlingAct = class
@@ -32,22 +41,17 @@ RM.SlingAct = class
     this.key = opts.key || 'longchat';
     this.root = scene.add.container(0, 0);
     this.launches = 0;
+    this.need = opts.launches || RM.SLING.launches; // nombre de lancers
+    this.sc = opts.scale || 2.6;
     this.state = 'wait';
 
     const s = scene,
       A = area;
 
-    // le point de gomme : le chat y est collé
-    this.anchor = { x: A.x + A.w * 0.42, y: A.y + A.h * 0.62 };
-
-    const gum = s.add.graphics();
-
-    gum.fillStyle(0xff7eb6, 1).fillEllipse(this.anchor.x, this.anchor.y + 8, 120, 30);
-    gum.fillStyle(0xffb3d4, 1).fillEllipse(this.anchor.x - 14, this.anchor.y + 3, 44, 10);
-    this.root.add(gum);
-
-    this.band = s.add.graphics();
-    this.root.add(this.band);
+    // il est au centre du cadre
+    this.anchor = { x: A.x + A.w / 2, y: A.y + A.h * 0.56 };
+    this.elastic = this.key === 'longchat'; // Chat-cordéon ne s'étire pas : on le tire tout entier
+    this.rest = this.elastic ? 7 : 0; // la pose roulée en boule
 
     this.hint = RM.text(s, A.x + A.w / 2, A.y + 50, this.L.hint || '', 30, '#6b4f7f', {
       wordWrap: { width: A.w - 60 },
@@ -57,15 +61,37 @@ RM.SlingAct = class
 
     // le chat : au-dessus de tout quand il vole (il sort du cadre)
     this.cat = s.add
-      .sprite(this.anchor.x, this.anchor.y, this.key, 0)
+      .sprite(this.anchor.x, this.anchor.y, this.key, this.rest)
       .setOrigin(0.5, 1)
       .setScale(opts.scale || 2.6)
       .setDepth(30);
 
-    this.cat.setInteractive({ draggable: true, useHandCursor: true });
-    this.cat.on('dragstart', () => this.dragStart());
-    this.cat.on('drag', (p) => this.dragMove(p));
-    this.cat.on('dragend', () => this.dragEnd());
+    // étiré : la tête et les pattes gardent leur forme, seul le corps s'allonge
+    if (this.elastic)
+    {
+      this.long = new RM.LongCat(s, 0, 0, 3.2, true);
+      this.long.c.setDepth(30).setVisible(false);
+    }
+
+    // on le prend en touchant le chat (zone généreuse autour de lui)
+    const gw = opts.run ? RM.SLING.runGrab : 300;
+
+    this.grab = s.add.zone(this.anchor.x, this.anchor.y - 50, gw, gw * 0.9).setInteractive({ draggable: true, useHandCursor: true });
+    this.root.add(this.grab);
+    this.grab.on('dragstart', () => this.dragStart());
+    this.grab.on('drag', (p) => this.dragMove(p));
+    this.grab.on('dragend', () => this.dragEnd());
+
+    // fin réussie : une barre de temps en haut du cadre
+    if (opts.run)
+    {
+      this.timeLeft = opts.timeLimit || 20000;
+      this.timeMax = this.timeLeft;
+      this.bar = s.add.graphics();
+      this.root.add(this.bar);
+      this.hint.setY(A.y + 80);
+      this.newRunTarget();
+    }
 
     this.onUpdate = (t, dt) => this.update(dt / 1000);
     s.events.on('update', this.onUpdate);
@@ -113,27 +139,15 @@ RM.SlingAct = class
           y: to.y - 60,
           duration: 900,
           ease: 'Sine.easeInOut',
-          onUpdate: () =>
-          {
-            c.setPosition(hand.x, hand.y + 60);
-            this.drawBand();
-          },
+          onUpdate: () => this.setPull(hand.x - this.anchor.x, hand.y + 60 - this.anchor.y),
         },
         { targets: hand, alpha: 0, duration: 200 },
-        {
-          targets: c,
-          x: this.anchor.x,
-          y: this.anchor.y,
-          duration: 300,
-          ease: 'Back.easeOut',
-          onUpdate: () => this.drawBand(),
-        },
       ],
       onComplete: () =>
       {
         hand.destroy();
         this.demoHand = null;
-        this.band.clear();
+        this.relax();
 
         if (!this.dead)
         {
@@ -152,23 +166,67 @@ RM.SlingAct = class
     }
   }
 
-  // L'élastique de gomme entre le point de colle et le chat
-  drawBand()
+  // Le doigt est à (vx, vy) du centre : le chat s'étire jusque-là
+  setPull(vx, vy)
   {
-    const a = this.anchor,
-      c = this.cat;
+    const a = this.anchor;
+    const v = new Phaser.Math.Vector2(vx, vy);
 
-    const d = Phaser.Math.Distance.Between(a.x, a.y, c.x, c.y);
+    if (v.length() > RM.SLING.maxPull)
+    {
+      v.setLength(RM.SLING.maxPull);
+    }
 
-    this.band.clear();
+    this.pull = v;
 
-    if (d < 4)
+    // Chat-cordéon : ses pieds restent en place, sa tête suit le doigt, son soufflet s'allonge
+    if (!this.elastic)
+    {
+      const len = v.length();
+
+      if (len > 6)
+      {
+        this.cat
+          .setOrigin(0.5, 1)
+          .setPosition(a.x, a.y)
+          .setRotation(Math.atan2(v.y, v.x) + Math.PI / 2)
+          .setScale(this.sc * (1 - len / 1500), this.sc * (1 + len / 260));
+      }
+
+      return;
+    }
+
+    const d = v.length();
+
+    if (d < 6)
     {
       return;
     }
 
-    this.band.lineStyle(Math.max(6, 22 - d / 14), 0xff7eb6, 1);
-    this.band.lineBetween(a.x, a.y, c.x, c.y - 20);
+    // la tête suit le doigt, les pattes restent de l'autre côté du centre
+    const L = this.long;
+    const u = v.clone().normalize();
+    const cy = a.y - 50;
+
+    this.cat.setVisible(false);
+    L.c.setVisible(true);
+    L.setLength(L.base + d);
+    L.c.setPosition(a.x + u.x * (d + L.base / 2), cy + u.y * (d + L.base / 2));
+    L.c.setRotation(Math.atan2(-u.y, -u.x));
+  }
+
+  // Il reprend sa forme, en boule au centre
+  relax()
+  {
+    this.pull = null;
+
+    if (this.long)
+    {
+      this.long.c.setVisible(false);
+    }
+
+    this.cat.setVisible(true).setOrigin(0.5, 1).setAngle(0).setScale(this.sc).setPosition(this.anchor.x, this.anchor.y);
+    this.pose(this.rest);
   }
 
   dragStart()
@@ -179,8 +237,9 @@ RM.SlingAct = class
     }
 
     this.state = 'pull';
-    this.pose(11); // tout étiré
+    this.hint.setText('');
     RM.Sfx.tap();
+    RM.Sfx.tone(260, 0.25, 'sawtooth', 0.05, 0, 520); // il s'étire : « iiiiii »
   }
 
   dragMove(p)
@@ -190,17 +249,7 @@ RM.SlingAct = class
       return;
     }
 
-    const a = this.anchor;
-    const v = new Phaser.Math.Vector2(p.x - a.x, p.y - a.y + 20);
-
-    if (v.length() > RM.SLING.maxPull)
-    {
-      v.setLength(RM.SLING.maxPull);
-    }
-
-    this.cat.setPosition(a.x + v.x, a.y + v.y);
-    this.cat.setAngle(Phaser.Math.RadToDeg(Math.atan2(-v.y, -v.x)) - 180);
-    this.drawBand();
+    this.setPull(p.x - this.anchor.x, p.y - this.anchor.y + 50);
   }
 
   dragEnd()
@@ -210,29 +259,16 @@ RM.SlingAct = class
       return;
     }
 
-    const a = this.anchor,
-      c = this.cat;
-
-    const v = new Phaser.Math.Vector2(a.x - c.x, a.y - c.y);
+    const c = this.cat;
+    const v = this.pull ? this.pull.clone().negate() : new Phaser.Math.Vector2(0, 0);
     const d = v.length();
 
-    this.band.clear();
+    this.relax();
 
-    // trop petit : il revient à sa place
+    // trop petit : il reste à sa place
     if (d < RM.SLING.minPull)
     {
-      this.state = 'back';
-      this.pose(0);
-      c.setAngle(0);
-
-      this.scene.tweens.add({
-        targets: c,
-        x: a.x,
-        y: a.y,
-        duration: 200,
-        onComplete: () => (this.state = 'ready'),
-      });
-
+      this.state = 'ready';
       return;
     }
 
@@ -249,6 +285,9 @@ RM.SlingAct = class
     c.y -= c.displayHeight / 2;
     RM.Sfx.pop();
     this.pow(c.x, c.y - 60, 'SCHLAC !');
+
+    // il met la boutique en désordre : de plus en plus à chaque lancer
+    RM.Mess.panic(this.scene);
   }
 
   // Un mot de bande dessinée qui saute et disparaît
@@ -306,9 +345,113 @@ RM.SlingAct = class
   }
 
   // À chaque image : le vol et les rebonds
+  // Fin réussie : un nouvel endroit où courir, dans le cadre
+  newRunTarget()
+  {
+    const A = this.A;
+
+    const a = this.anchor;
+    let p,
+      guard = 0;
+
+    // un endroit loin de lui, jusque dans les coins du cadre
+    do
+    {
+      p = {
+        x: A.x + 70 + Math.random() * (A.w - 140),
+        y: A.y + 190 + Math.random() * (A.h - 230),
+      };
+    } while (Math.hypot(p.x - a.x, p.y - a.y) < RM.SLING.runFar && guard++ < 30);
+
+    this.runTo = p;
+  }
+
+  // Fin réussie : le temps passe ; il court quand on ne le tient pas
+  updateRun(dt)
+  {
+    const A = this.A;
+
+    // le temps ne passe pas pendant qu'il vole ou qu'il revient
+    if (this.state === 'ready' || this.state === 'pull')
+    {
+      this.timeLeft -= dt * 1000;
+    }
+
+    const k = Math.max(0, this.timeLeft / this.timeMax);
+
+    this.bar.clear();
+    this.bar.fillStyle(0x45306e, 0.25).fillRoundedRect(A.x + 40, A.y + 26, A.w - 80, 22, 11);
+    this.bar.fillStyle(k > 0.3 ? RM.C.gold : RM.CORR_RED, 1).fillRoundedRect(A.x + 40, A.y + 26, (A.w - 80) * k, 22, 11);
+
+    if (this.timeLeft <= 0 && !this.finished)
+    {
+      this.expired = true;
+
+      // en plein vol : on attend qu'il sorte (comeBack termine)
+      if (this.state !== 'fly' && this.state !== 'gone')
+      {
+        this.finish(false);
+      }
+
+      return;
+    }
+
+    if (this.state !== 'ready')
+    {
+      return;
+    }
+
+    const a = this.anchor,
+      c = this.cat;
+
+    const dx = this.runTo.x - a.x,
+      dy = this.runTo.y - a.y;
+
+    const d = Math.hypot(dx, dy);
+
+    if (d < 12)
+    {
+      this.newRunTarget();
+      return;
+    }
+
+    const st = Math.min(d, RM.SLING.runSpeed * dt);
+
+    a.x += (dx / d) * st;
+    a.y += (dy / d) * st;
+    this.runT = (this.runT || 0) + dt;
+    c.setPosition(a.x, a.y - Math.abs(Math.sin(this.runT * 12)) * 16); // il sautille
+    c.setFlipX(dx > 0);
+    this.grab.setPosition(a.x, a.y - 50);
+  }
+
+  // Fin réussie : c'est fini (ok = lancé 3 fois à temps)
+  finish(ok)
+  {
+    if (this.finished)
+    {
+      return;
+    }
+
+    this.finished = true;
+    this.state = 'over';
+    this.grab.disableInteractive();
+    this.hooks.done({ ok });
+  }
+
   update(dt)
   {
-    if (this.dead || this.state !== 'fly')
+    if (this.dead)
+    {
+      return;
+    }
+
+    if (this.o.run)
+    {
+      this.updateRun(Math.min(dt, 0.05));
+    }
+
+    if (this.state !== 'fly')
     {
       return;
     }
@@ -335,6 +478,7 @@ RM.SlingAct = class
 
       this.vel[axis] *= -1;
       RM.Sfx.tap();
+      RM.Mess.drop(this.scene, 2);
       this.scene.cameras.main.shake(80, 0.004);
 
       if (this.o.notes)
@@ -384,7 +528,13 @@ RM.SlingAct = class
         return;
       }
 
-      if (this.launches >= RM.SLING.launches)
+      if (this.o.run && (this.launches >= this.need || this.expired))
+      {
+        this.finish(this.launches >= this.need);
+        return;
+      }
+
+      if (!this.o.run && this.launches >= this.need)
       {
         this.hooks.done({});
         return;
@@ -392,7 +542,15 @@ RM.SlingAct = class
 
       // il revient par la droite, en glissant
       c.setOrigin(0.5, 1).setAngle(0);
-      this.pose(0);
+      this.pose(this.rest);
+
+      if (this.o.run)
+      {
+        this.anchor.y = this.A.y + 200 + Math.random() * (this.A.h - 260);
+        this.anchor.x = this.A.x + this.A.w - 120;
+        this.newRunTarget();
+      }
+
       c.setPosition(RM.W + 120, this.anchor.y);
 
       const back = this.L.back || [];
@@ -405,7 +563,7 @@ RM.SlingAct = class
       s.tweens.add({
         targets: c,
         x: this.anchor.x,
-        duration: 700,
+        duration: this.o.run ? 400 : 700,
         ease: 'Back.easeOut',
         onComplete: () =>
         {
@@ -426,6 +584,11 @@ RM.SlingAct = class
     if (this.demoHand)
     {
       this.demoHand.destroy();
+    }
+
+    if (this.long)
+    {
+      this.long.destroy();
     }
 
     this.cat.destroy();

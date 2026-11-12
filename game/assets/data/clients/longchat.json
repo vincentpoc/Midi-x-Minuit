@@ -1,0 +1,119 @@
+{
+  "name": "Long-chat",
+  "cordeonName": "Chat-cordéon",
+  "potion": "potion de dégommage",
+  "look": { "sprite": "longchat", "scale": 3, "footY": 1, "game": "sling", "healed": "longchat", "sleeping": "longchat_sleep", "failed": "chatcordeon", "midiDrinks": false },
+  "arrive": [
+    { "who": "client", "text": "Bonjour. Je m'appelle Long-chat." },
+    { "who": "midi", "text": "[bd]Loooooooooooooong-chat ?[/bd]", "emotes": {"client": "😑"} },
+    { "who": "client", "text": "Non. Juste Long-chat. Enfin… avant, j'étais juste un chat." },
+    { "who": "client", "text": "Je me suis assis dans la gomme à mâcher d'un troll. Depuis, quand on me tire, je m'étire.", "emotes": {"minuit": "😮", "midi": "🤩"} },
+    { "who": "minuit", "text": "Quand on te tire… tu t'étires ?" }
+  ],
+  "ausculte": {
+    "intro": [
+      { "who": "minuit", "text": "Ne bouge pas, je vais t'examiner." },
+      { "who": "minuit", "text": "Il va falloir…" }
+    ],
+    "start": { "who": "midi", "text": "[bd]LE TIRER PAR LA QUEUE ![/bd]" },
+    "hint": "Tire Long-chat en arrière, puis lâche !",
+    "demo": "Regarde : on tire, et on lâche !",
+    "oups": ["Oups.", "Re-oups.", "Oups… mais c'était génial !"],
+    "back": ["Je reviens !", "Ça va, ça va… Je reviens."],
+    "stop": [
+      { "who": "minuit", "text": "Ça suffit ! Midi, ce n'est pas un lance-pierre !" },
+      { "who": "midi", "text": "Non… c'est un lance-CHAT !", "emotes": {"minuit": "😒"} },
+      { "who": "client", "text": "Euh… Je crois que je suis encore plus long qu'avant." }
+    ],
+    "done": [
+      { "who": "minuit", "text": "Hmm… C'est une gommite de troll aiguë. Il te faut une {potion} !" },
+      { "who": "client", "text": "Ça goûte quoi ?" },
+      { "who": "midi", "text": "La gomme à mâcher, j'espère !" }
+    ]
+  },
+  "recetteOutro": [
+    { "who": "minuit", "text": "La liste est prête. Pour la potion, il faut aussi mesurer Long-chat." },
+    { "who": "midi", "text": "Je tire ! Je tire !" },
+    { "who": "minuit", "text": "Non. Toi, tu ne tires plus RIEN." }
+  ],
+  "etirer": {
+    "intro": [
+      { "who": "minuit", "text": "Chaque coup sur la queue l'allonge toujours de la même longueur." },
+      { "who": "minuit", "text": "D'abord, tu calcules sa longueur. Ensuite, tu tires pour vérifier !" }
+    ],
+    "ask": "Il me faut {k} coups de {t} cm. Combien de cm mesurera Long-chat ?",
+    "pull": "Maintenant, tire la queue et lâche !",
+    "series": [
+      { "who": "minuit", "text": "Plus fort ! Maintenant, chaque coup l'allonge de {t} cm." },
+      { "who": "client", "text": "Doucement, quand même…" }
+    ],
+    "outro": [
+      { "who": "client", "text": "Je me sens… élastique." },
+      { "who": "minuit", "text": "Bravo, toutes les mesures sont prises !" }
+    ]
+  },
+  "minuteur": {
+    "intro": [
+      { "who": "minuit", "text": "Maintenant, on fait cuire les ingrédients." },
+      { "who": "minuit", "text": "Sur mon minuteur, chaque chiffre vaut 5 secondes. Tourne l'aiguille sur le bon chiffre !" },
+      { "who": "midi", "text": "Comme sur une vraie horloge !" }
+    ],
+    "ask": "Il faut cuire les {ingredient} pendant {n} secondes. Sur quel chiffre je mets le minuteur ?",
+    "series": [
+      { "who": "minuit", "text": "Cette fois, les secondes ne sont plus écrites. Tu sais déjà les trouver !" }
+    ],
+    "outro": [
+      { "who": "minuit", "text": "Tout est cuit à point !" },
+      { "who": "client", "text": "Ça sent… le chewing-gum." }
+    ]
+  },
+  "chasse": {
+    "intro": [
+      { "who": "midi", "text": "Pendant que ça cuit… mes goûters sont en haut de l'armoire !" },
+      { "who": "minuit", "text": "Midi, on n'a pas le temps." },
+      { "who": "midi", "text": "Long-chat va m'aider ! Viens, Long-chat !" },
+      { "who": "client", "text": "Quoi ? Non, non, non…", "emotes": {"midi": "😁"} }
+    ],
+    "ask": "Prends la boîte de",
+    "tapHint": "Touche l'écran pour lancer Long-chat !",
+    "pickHint": "Vite, touche la bonne boîte !",
+    "good": ["Mon goûter !", "Miam ! Un cookie !", "C'est le bon !"],
+    "bad": ["Beurk ! C'est un ingrédient !", "Ce n'est pas un goûter, ça !"],
+    "missed": "Raté, il n'a rien attrapé ! On recommence !",
+    "boxcat": "Une boîte ! Je peux rester dedans ?",
+    "boxcatEnd": "Oh, une boîte vide ! Je la garde !",
+    "outro": [
+      { "who": "minuit", "text": "Midi ! Tu as utilisé notre client comme lance-pierre !" },
+      { "who": "midi", "text": "Comme lance-CHAT." },
+      { "who": "client", "text": "J'ai le tournis…" }
+    ]
+  },
+  "success": [
+    { "who": "client", "text": "Oh ! Je suis… normal !" },
+    { "who": "minuit", "text": "La gomme est partie !" },
+    { "who": "midi", "text": "Dommage. C'était le meilleur lance-chat du monde.", "emotes": {"minuit": "😒"} },
+    { "who": "client", "text": "On pourra quand même rejouer, de temps en temps." }
+  ],
+  "failMelt": [
+    { "who": "minuit", "text": "Oh non… Il a fondu !", "emotes": {"midi": "😱"} },
+    { "who": "midi", "text": "Une flaque de chat… On peut le boire avec une paille ?" }
+  ],
+  "fail": [
+    { "who": "client", "text": "[bd]GLOP ![/bd] Euh… Pourquoi je fais de la musique ?" },
+    { "who": "minuit", "text": "Oh non ! Il s'est replié en accordéon !" },
+    { "who": "midi", "text": "C'est Chat-cordéon !" }
+  ],
+  "failDrink": [
+    { "who": "midi", "text": "Et un Chat-cordéon, ça se lance aussi ?" },
+    { "who": "minuit", "text": "Midi, non !" }
+  ],
+  "cordeon": {
+    "hint": "Tire Chat-cordéon en arrière, puis lâche !",
+    "oups": ["Oups.", "Re-oups.", "Ça fait de la musique !"],
+    "back": ["Ouille ouille ouille !", "Encore ?"]
+  },
+  "failFly": [
+    { "who": "client", "text": "J'ai la tête qui tourne… en musique." },
+    { "who": "midi", "text": "Il faut qu'on monte un groupe !" }
+  ]
+}

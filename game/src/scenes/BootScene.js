@@ -111,6 +111,20 @@ RM.BootScene = class extends Phaser.Scene
 
     this.load.image('chatcacahuete_burned', 'assets/chars/ChatCacahuette_burned.png');
 
+    // Chapitre 3 : Loooooong-chat (dessin de l'auteur, loongchat_noirblanc.png, poses remises
+    // dans des cases de 88 px, pieds en bas). 0 assis, 1 debout bras en l'air, 7 couché,
+    // 11 tout étiré, 12 debout, 14 bâille. Couché et étiré en trois morceaux (RM.LongCat).
+    this.load.spritesheet('longchat', 'assets/chars/longchat.png', { frameWidth: 88, frameHeight: 88 });
+
+    [
+      ['longchat_front', 'chars/longchat_front.png'],
+      ['longchat_mid', 'chars/longchat_mid.png'],
+      ['longchat_back', 'chars/longchat_back.png'],
+      ['longchat_sleep', 'chars/longchat_sleep.png'],
+      ['chatcordeon', 'chars/chatcordeon.png'], // loongchat_accordion.png (potion ratée)
+      ['longchat_liquid', 'chars/longchat_liquid.png'], // loongchat_liquid.png (potion ratée : il fond)
+    ].forEach(([k, f]) => this.load.image(k, `assets/${f}`));
+
     // Tous les dialogues du mode histoire (modifiables à la main) : common.json et un fichier par client.
     // Chargés en texte : on les lit nous-mêmes pour pouvoir dire où est l'erreur (voir RM.readStory).
     this.load.text('story_common', 'assets/data/common.json');
@@ -144,7 +158,8 @@ RM.BootScene = class extends Phaser.Scene
     );
 
     // Interface
-    ['book', 'sound', 'main_menu', 'star'].forEach((k) =>
+    // emote_bubble : bulle d'émotion vide (pack Kenney Emotes, CC0), un emoji va dedans
+    ['book', 'sound', 'main_menu', 'star', 'emote_bubble'].forEach((k) =>
       this.load.image(`ui_${k}`, `assets/ui/${k}.png`),
     );
 
@@ -314,6 +329,8 @@ RM.BootScene = class extends Phaser.Scene
         Promise.all([
           document.fonts.load("40px 'SundayFlower'"),
           document.fonts.load("40px 'Twikling'"),
+          document.fonts.load("40px 'Bangers'"),
+          document.fonts.load("40px 'LilitaOne'"),
         ]),
         new Promise((r) => setTimeout(r, 2500)),
       ]).then(go, go);
@@ -522,7 +539,39 @@ RM.checkStory = (S) =>
     const c = S.clients[id];
 
     // le mini-jeu du client (look.game) décide quelles répliques il lui faut
-    const chase = c.look && c.look.game === 'chase';
+    const game = c.look && c.look.game;
+    const chase = game === 'chase';
+
+    // chapitre 3 (le lance-chat) : ses activités ont leurs propres répliques
+    const sling = [
+      'ausculte.hint',
+      'ausculte.demo',
+      'ausculte.oups',
+      'ausculte.back',
+      'recetteOutro',
+      'etirer.intro',
+      'etirer.ask',
+      'etirer.pull',
+      'etirer.series',
+      'etirer.outro',
+      'minuteur.intro',
+      'minuteur.ask',
+      'minuteur.series',
+      'minuteur.outro',
+      'chasse.intro',
+      'chasse.ask',
+      'chasse.tapHint',
+      'chasse.pickHint',
+      'chasse.good',
+      'chasse.bad',
+      'chasse.missed',
+      'chasse.boxcat',
+      'chasse.boxcatEnd',
+      'chasse.outro',
+      'cordeon.hint',
+      'cordeon.oups',
+      'cordeon.back',
+    ];
 
     need(
       c,
@@ -546,7 +595,9 @@ RM.checkStory = (S) =>
         'ausculte.stop',
         'ausculte.done',
       ].concat(
-        chase
+        game === 'sling'
+          ? sling
+          : chase
           ? [
               'ausculte.caught',
               'ausculte.released',

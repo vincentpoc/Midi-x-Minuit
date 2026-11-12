@@ -21,6 +21,17 @@
       src: url('assets/font/Twikling.otf') format('opentype');
       font-display: block;
     }
+    /* Mot fort en BD ([bd]…[/bd]) et nombres en grand ([nb]…[/nb]) : polices Google, licence OFL */
+    @font-face {
+      font-family: 'Bangers';
+      src: url('assets/font/Bangers-Regular.ttf') format('truetype');
+      font-display: block;
+    }
+    @font-face {
+      font-family: 'LilitaOne';
+      src: url('assets/font/LilitaOne-Regular.ttf') format('truetype');
+      font-display: block;
+    }
     html, body {
       margin: 0; padding: 0; height: 100%;
       background: #1d1428;
@@ -31,7 +42,9 @@
     }
     #game { width: 100vw; height: 100vh; height: 100dvh; }
     /* Précharge la police pour que le canvas puisse l'utiliser */
-    #fontwarm, #fontwarm2 { position: absolute; left: -999px; top: -999px; }
+    #fontwarm, #fontwarm2, #fontwarm3, #fontwarm4 { position: absolute; left: -999px; top: -999px; }
+    #fontwarm3 { font-family: 'Bangers'; }
+    #fontwarm4 { font-family: 'LilitaOne'; }
     #fontwarm { font-family: 'SundayFlower'; }
     #fontwarm2 { font-family: 'Twikling'; }
   </style>
@@ -39,6 +52,8 @@
 <body>
   <div id="fontwarm">Midi × Minuit ×÷</div>
   <div id="fontwarm2">Midi × Minuit</div>
+  <div id="fontwarm3">CROQUER !</div>
+  <div id="fontwarm4">3 × 7 = 21</div>
   <div id="game"></div>
 
   <script src="lib/phaser.min.js"></script>
@@ -55,6 +70,11 @@
   <script src="src/activities/IntroAct.js"></script>
   <script src="src/activities/BoxesAct.js"></script>
   <script src="src/activities/ChaseAct.js"></script>
+  <script src="src/activities/LongCat.js"></script>
+  <script src="src/activities/SlingAct.js"></script>
+  <script src="src/activities/StretchAct.js"></script>
+  <script src="src/activities/TimerAct.js"></script>
+  <script src="src/activities/SnackHuntAct.js"></script>
   <script src="src/scenes/BootScene.js"></script>
   <script src="src/scenes/TitleScene.js"></script>
   <script src="src/scenes/StoryScene.js"></script>
@@ -62,6 +82,7 @@
   <script src="src/story/endings.js"></script>
   <script src="src/chapters/chapitre1_chatboite.js"></script>
   <script src="src/chapters/chapitre2_cacahuete.js"></script>
+  <script src="src/chapters/chapitre3_longchat.js"></script>
   <script src="src/scenes/GrimoireScene.js"></script>
   <script src="src/main.js"></script>
 </body>

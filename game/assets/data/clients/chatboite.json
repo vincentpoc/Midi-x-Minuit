@@ -4,19 +4,19 @@
   "potion": "potion de décollage",
   "arrive": [
     { "who": "client", "text": "Au secours ! Je suis coincé dans ma boîte depuis ce matin !" },
-    { "who": "midi", "text": "Ha ha ha ! On dirait un colis ! Je peux t'envoyer par la poste ?" },
+    { "who": "midi", "text": "Ha ha ha ! On dirait un colis ! Je peux t'envoyer par la poste ?", "emotes": {"client": "😤"} },
     { "who": "minuit", "text": "Midi ! … Ne bouge pas, {client}. Je vais t'ausculter." }
   ],
   "ausculte": {
     "intro": [
       { "who": "minuit", "text": "Il va falloir…" }
     ],
-    "start": { "who": "midi", "text": "LE SECOUER PLEIN DE FOIS !" },
+    "start": { "who": "midi", "text": "[bd]LE SECOUER PLEIN DE FOIS ![/bd]" },
     "tickle": { "who": "client", "text": "Ça chatouille !" },
     "aaah": { "who": "client", "text": "Aaah, aaah, aaah !" },
     "upDown": { "who": "midi", "text": "Peut-être de haut en bas ?" },
     "tap": { "who": "midi", "text": "Peut-être qu'en tapant dessus, ça va marcher ?" },
-    "faster": { "who": "midi", "text": "Plus vite !" },
+    "faster": { "who": "midi", "text": "[bd]PLUS VITE ![/bd]" },
     "stop": [
       { "who": "minuit", "text": "Arrête !" }
     ],

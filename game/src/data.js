@@ -17,6 +17,15 @@ RM.FONT_TITLE = "'Twikling', Georgia, serif";
 // Sunday Flower est plus petite que l'ancienne police : tout le texte est agrandi de ce facteur.
 RM.FONT_SCALE = 1.12;
 
+// Le mot fort d'une réplique, façon bande dessinée : [bd]CROQUER DEDANS ![/bd] dans le texte
+RM.FONT_BD = "'Bangers', 'SundayFlower', sans-serif";
+
+// Les nombres en grand (corrections) : [nb]3 × 7 = 21[/nb] dans le texte
+RM.FONT_NB = "'LilitaOne', 'SundayFlower', sans-serif";
+
+// Les emojis des bulles d'émotion (dessinés par le téléphone)
+RM.FONT_EMOJI = "'Noto Color Emoji', 'Apple Color Emoji', 'Segoe UI Emoji', sans-serif";
+
 // Toutes les tables du jeu (une potion et un onglet du Grimoire pour chacune).
 RM.TABLES = [2, 3, 4, 5, 6, 7, 8, 9, 10];
 
@@ -77,13 +86,13 @@ RM.CHAPTER_PLAN = [
 ];
 
 // Nombre de chapitres déjà écrits
-RM.PLAYABLE_CHAPTERS = 2;
+RM.PLAYABLE_CHAPTERS = 3;
 
 // Le fichier de chaque chapitre (src/chapters/) s'inscrit ici
 RM.CHAPTERS = [];
 
 // Les fichiers de dialogues des clients (assets/data/clients/<nom>.json)
-RM.CLIENT_FILES = ['chatboite', 'chatcacahuete'];
+RM.CLIENT_FILES = ['chatboite', 'chatcacahuete', 'longchat'];
 
 RM.GROUPS = RM.CHAPTER_PLAN.slice(0, RM.PLAYABLE_CHAPTERS).map((c, i) =>
   Object.assign({ id: i, name: `Chapitre ${i + 1}` }, c),

@@ -4,20 +4,20 @@
   "potion": "potion de décacahuétage",
   "look": { "sprite": "chatcacahuete", "scale": 3, "footY": 1, "game": "chase", "healed": "cookie_cat", "sleeping": "cookie_sleep", "failed": "peanut_butter" },
   "arrive": [
-    { "who": "client", "text": "Bonjour… Je crois que j'ai mangé trop de cacahuètes." },
+    { "who": "client", "text": "Bonjour… Je crois que j'ai mangé trop de cacahuètes.", "emotes": {"midi": "😋"} },
     { "who": "minuit", "text": "Trop de cacahuètes ? Tu ES une cacahuète !" },
-    { "who": "midi", "text": "Miam… Une cacahuète géante !" }
+    { "who": "midi", "text": "Miam… Une cacahuète géante !", "emotes": {"client": "😨"} }
   ],
   "ausculte": {
     "intro": [
       { "who": "minuit", "text": "Ne bouge pas, je vais t'ausculter." },
-      { "who": "midi", "text": "Moi aussi, j'adore les cacahuètes…" }
+      { "who": "midi", "text": "Moi aussi, j'adore les cacahuètes…", "emotes": {"client": "😰", "minuit": "😒"} }
     ],
     "start": { "who": "minuit", "text": "Midi, NON ! Vite, éloigne Chat-cacahuète de Midi !" },
     "hint": "Glisse Chat-cacahuète loin de Midi !",
     "tapHint": "Tape vite sur Midi !",
     "caught": { "who": "minuit", "text": "Il l'a attrapé ! Tape sur Midi !" },
-    "released": { "who": "midi", "text": "Aïe ! Bon, d'accord…" },
+    "released": { "who": "midi", "text": "[bd]AÏE ![/bd] Bon, d'accord…" },
     "stop": [
       { "who": "minuit", "text": "Bravo ! Il ne l'a jamais attrapé. Midi, va t'asseoir." }
     ],
@@ -38,7 +38,7 @@
   "recette": {
     "snacks": [
       { "who": "midi", "text": "Et maintenant, mes ingrédients préférés !" },
-      { "who": "minuit", "text": "Midi ! Ce sont tes goûters, pas des ingrédients !" },
+      { "who": "minuit", "text": "Midi ! Ce sont tes goûters, pas des ingrédients !", "emotes": {"midi": "😇"} },
       { "who": "midi", "text": "Juste pour vérifier… Ça ne compte pas !" }
     ],
     "snacksOk": [
@@ -74,7 +74,7 @@
     "caught": [
       { "who": "client", "text": "Miam ! … Oh oh." },
       { "who": "minuit", "text": "Il a mangé le cookie… et il s'est transformé en cookie !" },
-      { "who": "midi", "text": "MON COOKIE ! … Euh, Cookie ?" }
+      { "who": "midi", "text": "[bd]MON COOKIE ![/bd] … Euh, Cookie ?" }
     ]
   },
   "fail": [

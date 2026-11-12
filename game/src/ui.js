@@ -373,7 +373,12 @@ RM.Bubble = class
       lineSpacing: 4,
     });
 
-    this.c.add([this.g, this.who, this.t]);
+    // le mot fort ([bd]…[/bd]) ou les nombres en grand ([nb]…[/nb]), sur leur propre ligne
+    this.big = scene.add.text(x + w / 2, y + h / 2 + 40, '', { fontFamily: RM.FONT_BD, fontSize: '60px' })
+      .setOrigin(0.5)
+      .setPadding(6, 4, 6, 8);
+
+    this.c.add([this.g, this.who, this.t, this.big]);
 
     this.speakBtn = RM.roundButton(
       scene,
@@ -381,7 +386,7 @@ RM.Bubble = class
       y + 30,
       22,
       { key: 'ui_sound' },
-      () => RM.speak(this.t.text),
+      () => RM.speak(this.plain || this.t.text),
       { color: 0xb59ad8, dark: 0x8d70b5 },
     );
 
@@ -411,17 +416,64 @@ RM.Bubble = class
     }
 
     this.who.setText(who);
-    this.t.setText(text);
+
+    // [bd]…[/bd] : le mot fort en police BD ; [nb]…[/nb] : les nombres en grand.
+    // Le reste du texte reste au-dessus, en plus petit.
+    const m = /\[(bd|nb)\]([\s\S]*?)\[\/\1\]/.exec(text);
+    const rest = m ? (text.slice(0, m.index) + ' ' + text.slice(m.index + m[0].length)).replace(/\s+/g, ' ').trim() : text;
+
+    this.plain = m ? `${rest} ${m[2]}`.trim() : text; // pour la lecture à voix haute
+    this.t.setText(rest);
 
     // réduit la taille si le texte est long
-    let size = Math.round(34 * RM.FONT_SCALE);
+    let size = Math.round((m ? 30 : 34) * RM.FONT_SCALE);
 
     this.t.setFontSize(size);
 
-    while (this.t.height > h - 50 && size > 22)
+    while (this.t.height > (m ? h - 120 : h - 50) && size > 22)
     {
       size -= 2;
       this.t.setFontSize(size);
+    }
+
+    if (m)
+    {
+      const bd = m[1] === 'bd';
+
+      this.big
+        .setText(m[2])
+        .setFontFamily(bd ? RM.FONT_BD : RM.FONT_NB)
+        .setFontSize(bd ? 60 : 64)
+        .setColor(bd ? '#c2410c' : '#45306e')
+        .setStroke('#3b2a4a', bd ? 8 : 0)
+        .setShadow(bd ? 3 : 0, bd ? 3 : 0, '#3b2a4a', 0, bd, bd)
+        .setAngle(bd ? -4 : 0)
+        .setVisible(true);
+
+      // trop large : on réduit
+      let bigSize = bd ? 60 : 64;
+
+      while (this.big.width > w - 60 && bigSize > 30)
+      {
+        bigSize -= 4;
+        this.big.setFontSize(bigSize);
+      }
+
+      // seul (toute la réplique est le mot fort) : au milieu ; sinon sous le texte
+      if (rest)
+      {
+        this.t.setY(y + 26 + (h - 26) * 0.32);
+        this.big.setY(y + 26 + (h - 26) * 0.7);
+      }
+      else
+      {
+        this.big.setY(y + h / 2 + 10);
+      }
+    }
+    else
+    {
+      this.big.setVisible(false);
+      this.t.setY(y + h / 2 + 10);
     }
 
     this.c.setScale(0.96);
@@ -434,6 +486,64 @@ RM.Bubble = class
     this.tailUp = tailUp;
     this.c.y = newY - this.y;
   }
+};
+
+// ---------- Bulles d'émotion ----------
+// Le haut de la tête d'un personnage, à l'écran : la première rangée de pixels visibles de son image
+// (le dessin ne remplit pas toute l'image). Gardé en mémoire pour chaque image.
+RM.headTop = (scene, spr) =>
+{
+  const b = spr.getBounds();
+  const key = spr.texture.key,
+    frame = spr.frame.name;
+
+  RM.headRows = RM.headRows || {};
+
+  const id = `${key}#${frame}`;
+
+  if (RM.headRows[id] === undefined)
+  {
+    const fw = spr.frame.width,
+      fh = spr.frame.height;
+
+    let row = 0;
+
+    search: for (let y = 0; y < fh; y++)
+    {
+      for (let x = 0; x < fw; x++)
+      {
+        if (scene.textures.getPixelAlpha(x, y, key, frame) > 0)
+        {
+          row = y;
+          break search;
+        }
+      }
+    }
+
+    RM.headRows[id] = row / fh;
+  }
+
+  return b.top + RM.headRows[id] * b.height;
+};
+
+// Une bulle d'émotion (vide) avec un emoji dedans, posée au-dessus de la tête d'un personnage
+RM.emote = (scene, spr, emoji) =>
+{
+  const c = scene.add.container(spr.x, RM.headTop(scene, spr) - 4).setDepth(9);
+
+  // la bulle fait 16 px (dessin Kenney), agrandie × 4 ; sa pointe touche la tête
+  const img = scene.add.image(0, 0, 'ui_emote_bubble').setOrigin(0.5, 1).setScale(4);
+
+  const t = scene.add
+    .text(0, -38, emoji, { fontFamily: RM.FONT_EMOJI, fontSize: '32px' })
+    .setOrigin(0.5)
+    .setPadding(4, 4, 4, 4);
+
+  c.add([img, t]);
+  c.setScale(0);
+  scene.tweens.add({ targets: c, scale: 1, duration: 220, ease: 'Back.easeOut' });
+
+  return c;
 };
 
 // ---------- Noircis par l'explosion ----------

@@ -92,6 +92,7 @@ Object.assign(RM.StoryScene.prototype, {
     return lines.map((l) => ({
       who: l.who,
       text: RM.fmt(l.text, Object.assign({}, this.vars, extra)),
+      emotes: l.emotes, // bulles d'émotion de ceux qui écoutent (facultatif)
     }));
   },
 
@@ -207,7 +208,8 @@ Object.assign(RM.StoryScene.prototype, {
       await this.dialog(this.fill(St.recette.missing));
     }
 
-    await this.dialog(this.fill(St.recette.outro));
+    // un client peut avoir sa propre fin de recette (chapitre 3 : pas de marché ni de bouillon)
+    await this.dialog(this.fill(this.client.recetteOutro || St.recette.outro));
   },
 
   // Le bouillon : 2 séries de 3, sans Midi (il est parti au marché).

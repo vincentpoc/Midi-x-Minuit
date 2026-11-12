@@ -180,5 +180,5 @@
     { "id": "banane", "name": "banane", "plural": "bananes", "sprite": {"key": "tiny", "frame": 1} },
     { "id": "jambon", "name": "jambon", "plural": "tranches de jambon", "sprite": {"key": "tiny", "frame": 11} }
   ],
-  "chapterClients": ["chatboite", "chatcacahuete", "chatboite"]
+  "chapterClients": ["chatboite", "chatcacahuete", "longchat"]
 }

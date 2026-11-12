@@ -82,6 +82,8 @@ RM.StoryScene = class extends Phaser.Scene
     this.dialogNext = false;
     this.quickTimer = null;
     this.quitBox = null;
+    this.clientSayFx = null; // un effet quand le client parle (chapitre 3 : les notes de Chat-cordéon)
+    this.lcBody = null; // chapitre 3 : le corps de Long-chat allongé
     this.time.paused = false;
     RM.Progress.startDay();
 
@@ -378,6 +380,12 @@ RM.StoryScene = class extends Phaser.Scene
   // À chaque image : les ombres et l'objet porté par Midi suivent les personnages
   update()
   {
+    // ce qui est propre au chapitre (chapitre 3 : le corps de Long-chat suit sa tête)
+    if (this.chapterDef && this.chapterDef.update)
+    {
+      this.chapterDef.update(this);
+    }
+
     (this.shadows || []).forEach(({ e, who }) =>
     {
       const spr = who();
@@ -422,9 +430,17 @@ RM.StoryScene = class extends Phaser.Scene
   }
 
   // réplique rapide (n'attend pas)
-  say(who, text)
+  // emotes (facultatif) : { minuit: '😠', client: '😨' }, des bulles d'émotion au-dessus des
+  // personnages qui écoutent. Celui qui parle n'en a jamais (trop d'informations à la fois).
+  say(who, text, emotes)
   {
     this.bubble.say(RM.fmt(text, this.vars), this.tail(who), this.nameOf(who));
+    this.showEmotes(emotes, who);
+
+    if (who === 'client' && this.clientSayFx)
+    {
+      this.clientSayFx();
+    }
 
     const spr = this.spriteOf(who);
 
@@ -432,6 +448,23 @@ RM.StoryScene = class extends Phaser.Scene
     {
       this.tweens.add({ targets: spr, y: spr.y - 14, duration: 120, yoyo: true });
     }
+  }
+
+  // Les bulles d'émotion d'une réplique (les précédentes s'en vont)
+  showEmotes(emotes, speaker)
+  {
+    (this.emotes || []).forEach((e) => e.destroy());
+    this.emotes = [];
+
+    Object.keys(emotes || {}).forEach((who) =>
+    {
+      const spr = this.spriteOf(who);
+
+      if (who !== speaker && spr && spr.visible && spr.active)
+      {
+        this.emotes.push(RM.emote(this, spr, emotes[who]));
+      }
+    });
   }
 
   // répliques rapides enchaînées (2,6 s chacune)
@@ -451,7 +484,7 @@ RM.StoryScene = class extends Phaser.Scene
         return;
       }
 
-      this.say(lines[i].who, lines[i].text);
+      this.say(lines[i].who, lines[i].text, lines[i].emotes);
       i++;
       this.quickTimer = this.time.delayedCall(2600, step);
     };
@@ -477,11 +510,12 @@ RM.StoryScene = class extends Phaser.Scene
         {
           this.dialogNext = false;
           this.setMain(null);
+          this.showEmotes(null);
           resolve();
           return;
         }
 
-        this.say(lines[i].who, lines[i].text);
+        this.say(lines[i].who, lines[i].text, lines[i].emotes);
         i++;
         this.dialogNext = true;
         this.setMain('Suite', show);
@@ -548,7 +582,7 @@ RM.StoryScene = class extends Phaser.Scene
       const C = RM.STORY.correction;
 
       RM.Sfx.pop();
-      this.say('minuit', `${C.title} ${calc} = ${answer}`);
+      this.say('minuit', `${C.title} [nb]${calc} = ${answer}[/nb]`); // les nombres en grand
       this.setMain(null);
 
       this.time.delayedCall(1500, () =>

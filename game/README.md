@@ -1,4 +1,4 @@
-# Midi × Minuit — mode histoire (v0.9 : chapitres 1 et 2)
+# Midi × Minuit — mode histoire (v0.9 : chapitres 1 à 3)
 
 Jeu Phaser 3 (HTML/JS, sans compilation), en portrait, pour réviser les tables de × et ÷.
 
@@ -52,6 +52,9 @@ Format :
 - Dans `common.json`, `titleIntro` = l'introduction sur l'écran d'accueil. Dans un fichier de client, `ausculte` = les répliques du mini-jeu ; `success` / `fail` = les deux fins.
 - Une liste de répliques s'affiche l'une après l'autre ; une liste de phrases simples (`"brag"`, `"mock"`…) est tirée au hasard.
 - Mots remplacés par le jeu : `{client}`, `{potion}`, `{calc}`, `{answer}`, `{proposal}`, `{ingredient}`, `{n}`, `{chapter}`.
+- **Mot fort en BD** : `[bd]CROQUER DEDANS ![/bd]` (police Bangers, sur sa propre ligne). Un seul par réplique.
+- **Nombres en grand** : `[nb]3 × 7 = 21[/nb]` (police Lilita One), surtout pour les corrections.
+- **Bulles d'émotion** : ajouter `"emotes": {"midi": "😋", "client": "😨"}` à une réplique d'une liste ; chaque personnage qui écoute a une bulle avec son emoji au-dessus de la tête (celui qui parle n'en a jamais).
 - Après une modification, recharge la page. S'il y a une faute (virgule ou guillemet oublié), le jeu affiche le nom du fichier et le numéro de la ligne. S'il manque une réplique dont le jeu a besoin, il en donne la liste et propose « Continuer quand même ».
 
 ## Structure
@@ -64,7 +67,8 @@ src/progress.js         sauvegarde + boîtes de Leitner (maîtrise de chaque fai
 src/ui.js               boutons, slider, bulle, sons, voix
 src/chapters/           ⭐ un fichier par chapitre et client : son déroulement et ce qui lui est propre
   chapitre1_chatboite.js   la secousse ; potion ratée = tout le monde s'envole
-  chapitre2_cacahuete.js   la patte, le jeu du cookie ; potion ratée = beurre de cacahuète
+  chapitre2_cacahuete.js   la poursuite, le jeu du cookie ; potion ratée = beurre de cacahuète
+  chapitre3_longchat.js    Loooooong-chat : lance-chat, étirer, minuteur, chasse aux goûters ; potion ratée = Chat-cordéon
 src/story/
   steps.js              étapes communes : recette, bouillon, rappel, rangement, bulles
   endings.js            fins communes : potion, explosion, sauvegarde, écran de fin
@@ -75,7 +79,12 @@ src/activities/         une activité par fichier
   BoxesAct.js           les boîtes de 2, 4 ou 8
   BubblesAct.js         les bulles en plein écran
   IntroAct.js           « Tu les connais déjà ! » et le rappel des calculs ratés
-  PawAct.js             le jeu de la patte
+  ChaseAct.js           la poursuite (chapitre 2)
+  LongCat.js            Long-chat allongé en 3 morceaux (chapitre 3)
+  SlingAct.js           le lance-chat à rebonds (chapitre 3)
+  StretchAct.js         étirer Long-chat sur sa règle (chapitre 3)
+  TimerAct.js           le minuteur (chapitre 3)
+  SnackHuntAct.js       la chasse aux goûters en haut de l'armoire (chapitre 3)
 assets/data/            ⭐ tous les dialogues : common.json + clients/<nom>.json
 src/mechanics/
   CauldronMech.js       A — le chaudron : atteindre X ml en combinant les 3 potions de la série
@@ -90,7 +99,7 @@ assets/                 copies retravaillées de tes assets
 
 ## Modifier facilement
 
-- **Clients** : `assets/data/clients/<nom>.json` ; `chapterClients` (dans `common.json`) dit quel client vient à quel chapitre. `look` décrit son image (sprite, taille, mini-jeu `shake` ou `paw`, forme soignée / ratée).
+- **Clients** : `assets/data/clients/<nom>.json` ; `chapterClients` (dans `common.json`) dit quel client vient à quel chapitre. `look` décrit son image (sprite, taille, mini-jeu `shake`, `chase` ou `sling`, forme soignée / ratée).
 - **Ingrédients et goûters de Midi** (noms, images) : `ingredients` et `snacks` dans `assets/data/common.json`.
 - **Nouveau client et son chapitre** :
   1. Copie sa planche depuis `MagicRevision\Assets` dans `assets/chars/`, et ajoute une ligne dans `RM.CLIENTS` (`src/data.js`, taille d'une frame et nombre de frames).

@@ -230,6 +230,10 @@ RM.TitleScene = class extends Phaser.Scene
       RM.burn(this, this.minuit, 'witch_idle');
       RM.burn(this, this.midi, 'midi_idle');
     }
+    else if (failed && lc.look.midiDrinks === false)
+    {
+      // chapitre 3 : Midi n'a pas bu la potion, il reste lui-même
+    }
     else if (failed && failed !== 'green')
     {
       this.midi.stop().setTexture(failed).setOrigin(0.5, 1).setScale(3.4);
